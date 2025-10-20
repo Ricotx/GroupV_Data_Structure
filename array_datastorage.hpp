@@ -3,6 +3,7 @@
 #include "array.hpp"
 #include "readcsv.hpp"
 #include "preprocessor.hpp"
+#include "matching.hpp"
 #include <iostream>
 #include <ctime>
 #include <cstring>
@@ -141,6 +142,49 @@ public:
         if (job.skills.size() == 0)
             return 0.0;
         return (double)matchCount / job.skills.size();
+    }
+
+    // Simple keyword-based score based on full descriptions
+    int calculateKeywordOverlapScore(const Job& job, const Resume& resume) {
+        return calculateMatchScore(job.fullDescription, resume.fullDescription);
+    }
+
+    // Rank all jobs for a given resume using keyword overlap (bubble sort)
+    void rankJobsForResumeByKeywords(const Resume& resume) {
+        for (int i = 0; i < jobArray.getSize(); i++) {
+            jobArray[i].matchScore = static_cast<double>(calculateKeywordOverlapScore(jobArray[i], resume));
+        }
+        int n = jobArray.getSize();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (jobArray[j].matchScore < jobArray[j + 1].matchScore) {
+                    Job tmp = jobArray[j];
+                    jobArray[j] = jobArray[j + 1];
+                    jobArray[j + 1] = tmp;
+                }
+            }
+        }
+    }
+
+    // Linear search for a resume by id
+    Resume* linearSearchResumeById(int targetId) {
+        for (int i = 0; i < resumeArray.getSize(); i++) {
+            if (resumeArray[i].id == targetId) return &resumeArray[i];
+        }
+        return nullptr;
+    }
+
+    // Filter jobs whose title contains a keyword (case-insensitive using stored lowerCaseTitle)
+    CustomArrayV2<Job> filterJobsByTitleKeyword(const CustomString& keyword) const {
+        CustomArrayV2<Job> results;
+        CustomString lowerKey = convertToLowerCase(keyword);
+        for (int i = 0; i < jobArray.getSize(); i++) {
+            const Job& j = jobArray[i];
+            if (j.lowerCaseTitle.c_str() && lowerKey.c_str() && strstr(j.lowerCaseTitle.c_str(), lowerKey.c_str())) {
+                results.push_back(j);
+            }
+        }
+        return results;
     }
 
     void findTopMatchesForResume(const Resume& resume, int topN = 5) {

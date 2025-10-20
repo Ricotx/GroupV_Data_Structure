@@ -5,8 +5,11 @@
 
 using namespace std;
 
+// Include the array menu implementation directly to avoid separate linkage
+#include "test_array.cpp"
+
 int main() {
-    cout << "=== Job Description & Resume Linked List Data Structures Project ===" << endl;
+    cout << "=== Job Description & Resume Data Structures Project ===" << endl;
     cout << "Phase 1 & 2: Core Structures and Data Loading" << endl;
     cout << "================================================" << endl;
     
@@ -14,32 +17,28 @@ int main() {
     LinkedListDataStorage linkedListStorage;
     ArrayDataStorage arrayStorage;
     
-    // Load linked list data
+    // Load linked list data (uses default CSV paths)
     if (!linkedListStorage.loadLinkedListData()) {
         cerr << "Failed to load linked list data!" << endl;
-        return 1;
+        // continue to array path even if linked list fails
+    } else {
+        // Display sample linked list data
+        linkedListStorage.displaySampleData(3, 3);
+        // Test some linked list operations
+        linkedListStorage.testLinkedListOperations();
     }
     
-    // Load array data
-    if (!arrayStorage.loadArrayData()) {
+    // Load array data with explicit CSV paths
+    if (!arrayStorage.loadArrayData("csv/job_description.csv", "csv/resume.csv")) {
         cerr << "Failed to load array data!" << endl;
-        return 1;
+    } else {
+        // Display sample array data
+        arrayStorage.displaySampleData(3);
     }
     
-    // Display sample data from both storage types
-    linkedListStorage.displaySampleLinkedListData(3, 3);
-    arrayStorage.displaySampleArrayData(3, 3);
+    cout << "\n=== Launching Array Team Menu ===" << endl;
+    runArrayMenu();
     
-    // Display statistics from both storage types
-    linkedListStorage.displayLinkedListStats();
-    arrayStorage.displayArrayStats();
-    
-    // Test operations on both storage types
-    linkedListStorage.testLinkedListOperations();
-    arrayStorage.testArrayOperations();
-    
-    cout << "\n=== Phase 1 & 2 Complete ===" << endl;
-    cout << "Ready for Phase 3: Linked List Operations (Sorting, Searching, Matching)" << endl;
-    
+    cout << "\n=== Program Complete ===" << endl;
     return 0;
 }
