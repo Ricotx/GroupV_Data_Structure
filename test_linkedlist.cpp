@@ -222,7 +222,7 @@ void handleSortMenu(LinkedListDataStorage& dataStorage) {
 
 // --- Main Function (Combined) ---
 
-int main() {
+void runLinkedListMenu() {
     LinkedListDataStorage dataStorage;
     int choice;
     
@@ -282,6 +282,4 @@ int main() {
                 break;
         }
     } while (choice != 0);
-
-    return 0;
 }

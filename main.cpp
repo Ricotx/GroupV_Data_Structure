@@ -7,38 +7,47 @@ using namespace std;
 
 // Include the array menu implementation directly to avoid separate linkage
 #include "test_array.cpp"
+#include "test_linkedlist.cpp"
+
+void displayTopLevelMenu(){
+    cout << "\n=== Job Matching System - Main Menu ===" << endl;
+    cout << "Select a data structure to test:" << endl;
+    cout << "1. Linked List Implementation" << endl;
+    cout << "2. Array Implementation" << endl;
+    cout << "0. Exit Program" << endl;
+    cout << "=========================================" << endl;
+    cout << "Enter your choice: ";
+}
 
 int main() {
     cout << "=== Job Description & Resume Data Structures Project ===" << endl;
-    cout << "Phase 1 & 2: Core Structures and Data Loading" << endl;
     cout << "================================================" << endl;
+    int choice;
+    do {
+        displayTopLevelMenu();
+        if (!(cin >> choice)) {
+            cout << "\n[INVALID INPUT] Please enter a number." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            choice = -1; // Set to invalid choice to loop again
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                cout << "\n=== Launching Linked List Team Menu ===" << endl;
+                runLinkedListMenu();
+                break;
+            case 2:
+                cout << "\n=== Launching Array Team Menu ===" << endl;
+                runArrayMenu();
+                break;
+            case 0:
+                cout << "Exiting program." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    } while (choice != 0);
     
-    // Create separate data storage for linked lists and arrays
-    LinkedListDataStorage linkedListStorage;
-    ArrayDataStorage arrayStorage;
-    
-    // Load linked list data (uses default CSV paths)
-    if (!linkedListStorage.loadLinkedListData()) {
-        cerr << "Failed to load linked list data!" << endl;
-        // continue to array path even if linked list fails
-    } else {
-        // Display sample linked list data
-        linkedListStorage.displaySampleData(3, 3);
-        // Test some linked list operations
-        linkedListStorage.testLinkedListOperations();
-    }
-    
-    // Load array data with explicit CSV paths
-    if (!arrayStorage.loadArrayData("csv/job_description.csv", "csv/resume.csv")) {
-        cerr << "Failed to load array data!" << endl;
-    } else {
-        // Display sample array data
-        arrayStorage.displaySampleData(3);
-    }
-    
-    cout << "\n=== Launching Array Team Menu ===" << endl;
-    runArrayMenu();
-    
-    cout << "\n=== Program Complete ===" << endl;
-    return 0;
 }
