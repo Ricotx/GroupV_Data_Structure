@@ -1,5 +1,6 @@
 #pragma once
 #include "model.hpp"
+#include <stdexcept>
 
 using namespace std;
 
@@ -67,30 +68,6 @@ public:
         size++;
     }
     
-    // Essential for data access
-    T& operator[](int index) {
-        if (index < 0 || index >= size) {
-            throw out_of_range("Index out of range");
-        }
-        
-        ListNode<T>* current = head;
-        for (int i = 0; i < index; i++) {
-            current = current->next;
-        }
-        return current->data;
-    }
-    
-    const T& operator[](int index) const {
-        if (index < 0 || index >= size) {
-            throw out_of_range("Index out of range");
-        }
-        
-        ListNode<T>* current = head;
-        for (int i = 0; i < index; i++) {
-            current = current->next;
-        }
-        return current->data;
-    }
     
     // Essential for data management
     int getSize() const {
@@ -111,7 +88,55 @@ public:
         size = 0;
     }
 
+    //Added from Leon Kin's
+    T& operator[](int index) {
+        return getNodeAt(index)->data;
+    }
+    
+    const T& operator[](int index) const {
+        return getNodeAt(index)->data;
+    }
+
+
+    ListNode<T>* getNodeAt(int index) const {
+        if (index < 0 || index >= size) {
+            throw out_of_range("Index out of range");
+        }
+        ListNode<T>* current = head;
+        for (int i = 0; i < index; ++i) {
+            current = current->next;
+        }
+        return current;
+    }
+
     ListNode<T>* getHead() const {
         return head;
+    }
+
+    ListNode<T>* getTailNode() {
+        return tail;
+    }
+
+    void swapNodes(ListNode<T>* nodeA, ListNode<T>* nodeB) {
+        if (!nodeA || !nodeB || nodeA->next != nodeB) {
+            return;
+        }
+
+        if (nodeA->prev) {
+            nodeA->prev->next = nodeB;
+        } else {
+            head = nodeB;
+        }
+
+        if (nodeB->next) {
+            nodeB->next->prev = nodeA;
+        } else {
+            tail = nodeA;
+        }
+
+        nodeA->next = nodeB->next;
+        nodeB->prev = nodeA->prev;
+        nodeB->next = nodeA;
+        nodeA->prev = nodeB;
     }
 };

@@ -2,6 +2,7 @@
 #include "readcsv.hpp"
 #include "linkedlist.hpp"
 #include "model.hpp"
+#include <chrono>
 
 using namespace std;
 
@@ -10,6 +11,10 @@ private:
     CustomLinkedList<Job> jobList;
     CustomLinkedList<Resume> resumeList;
     CustomArray<CustomString> validSkills;
+
+    //Untouch copies to preserve the file order
+    CustomLinkedList<Job> originalJobList;
+    CustomLinkedList<Resume> originalResumeList;
     bool dataLoaded;
     
 public:
@@ -36,6 +41,9 @@ public:
             // Load resumes into linked list with skillset filtering
             cout << "Loading resumes into linked list from " << resumeFile << "..." << endl;
             resumeList = loadResumesAsLinkedList(resumeFile, validSkills);
+
+            originalJobList = jobList;
+            originalResumeList = resumeList;
             
             dataLoaded = true;
             cout << "=== Linked List Data Loading Complete ===" << endl;
@@ -171,5 +179,241 @@ public:
             current = current->next;
         }
         return searchResumeSkillList;
+    }
+
+//Leon Kin's code - Bubble Sort and Job matching and performance testing.
+    void bubbleSortJobsByTitle() {
+        if (!dataLoaded || jobList.getSize() < 2) return;
+        cout << "Sorting jobs by title (A-Z)..." << endl;
+        bool swapped;
+        do {
+            swapped = false;
+            ListNode<Job>* current = jobList.getHead();
+            while (current && current->next) {
+                if (strcmp(current->data.jobTitle.c_str(), current->next->data.jobTitle.c_str()) > 0) {
+                    jobList.swapNodes(current, current->next);
+                    swapped = true;
+                }
+                current = current->next;
+            }
+        } while (swapped);
+        cout << "Jobs sorted by title." << endl;
+    }
+
+    void bubbleSortJobsBySkillCount() {
+        if (!dataLoaded || jobList.getSize() < 2) return;
+        cout << "Sorting jobs by skill count..." << endl;
+        bool swapped;
+        do {
+            swapped = false;
+            ListNode<Job>* current = jobList.getHead();
+            while (current && current->next) {
+                if (current->data.skillCount > current->next->data.skillCount) {
+                    jobList.swapNodes(current, current->next);
+                    swapped = true;
+                }
+                current = current->next;
+            }
+        } while (swapped);
+        cout << "Jobs sorted by skill count." << endl;
+    }
+
+    void bubbleSortResumesBySkillCount() {
+        if (!dataLoaded || resumeList.getSize() < 2) return;
+        cout << "Sorting resumes by skill count..." << endl;
+        bool swapped;
+        do {
+            swapped = false;
+            ListNode<Resume>* current = resumeList.getHead();
+            while (current && current->next) {
+                if (current->data.skillCount > current->next->data.skillCount) {
+                    resumeList.swapNodes(current, current->next);
+                    swapped = true;
+                }
+                current = current->next;
+            }
+        } while (swapped);
+        cout << "Resumes sorted by skill count." << endl;
+    }
+
+    void bubbleSortJobsByMatchScore() {
+        if (!dataLoaded || jobList.getSize() < 2) return;
+        cout << "Sorting jobs by match score..." << endl;
+        bool swapped;
+        do {
+            swapped = false;
+            ListNode<Job>* current = jobList.getHead();
+            while (current && current->next) {
+                if (current->data.matchScore < current->next->data.matchScore) { // Descending
+                    jobList.swapNodes(current, current->next);
+                    swapped = true;
+                }
+                current = current->next;
+            }
+        } while (swapped);
+        cout << "Jobs sorted by match score." << endl;
+    }
+
+    void findAndDisplayTopMatches(int resumeIndex) {
+        if (resumeIndex < 0 || originalResumeList.getSize() <= resumeIndex) {
+            cout << "Invalid resume index." << endl;
+            return;
+        }
+
+        Resume& selectedResume = originalResumeList[resumeIndex];
+        
+        cout << "\nFinding job matches for Resume ID: " << selectedResume.id << endl;
+        cout << "Resume Skills (" << selectedResume.skillCount << "): ";
+        for (int i = 0; i < selectedResume.resumeSkills.size(); i++) {
+            cout << selectedResume.resumeSkills[i] << (i == selectedResume.resumeSkills.size() - 1 ? "" : ", ");
+        }
+        cout << endl;
+
+        for (int i = 0; i < jobList.getSize(); ++i) {
+            Job& currentJob = jobList[i];
+            
+            int matchingSkills = 0;
+            for (int j = 0; j < selectedResume.lowerCaseSkills.size(); ++j) {
+                for (int k = 0; k < currentJob.lowerCaseSkills.size(); ++k) {
+                    if (strcmp(selectedResume.lowerCaseSkills[j].c_str(), currentJob.lowerCaseSkills[k].c_str()) == 0) {
+                        matchingSkills++;
+                        break;
+                    }
+                }
+            }
+            
+            int unionSize = selectedResume.skillCount + currentJob.skillCount - matchingSkills;
+            currentJob.matchScore = (unionSize > 0) ? static_cast<double>(matchingSkills) / unionSize : 0.0;
+        }
+
+        bubbleSortJobsByMatchScore();
+
+        cout << "\n--- Top 5 Job Matches ---" << endl;
+        int count = 0;
+        for (int i = 0; i < jobList.getSize() && count < 5; ++i) {
+            if (jobList[i].matchScore > 0) {
+                cout << "Match Score: " << (jobList[i].matchScore * 100) << "%" << endl;
+                jobList[i].display();
+                count++;
+            }
+        }
+    }
+
+    void displaySampleJobsOnly(int maxJobs = 5) {
+        if (!dataLoaded) return;
+        cout << "\n--- Sample of Sorted Jobs ---" << endl;
+        displaySampleJobs(jobList, maxJobs);
+    }
+    void displaySampleResumesOnly(int maxResumes = 5) {
+        if (!dataLoaded) return;
+        cout << "\n--- Sample of Sorted Resumes ---" << endl;
+        displaySampleResumes(resumeList, maxResumes);
+    }
+
+
+    void runPerformanceTests() {
+        if (!dataLoaded) {
+            cout << "Please load data first." << endl;
+            return;
+        }
+        cout << "\n[Executing: Full Performance Test Suite]" << endl;
+        
+        // Test 1: Sort Jobs by Title
+        CustomLinkedList<Job> jobsToSortTitle = originalJobList;
+        auto start1 = chrono::high_resolution_clock::now();
+        bool swapped1;
+        do { 
+            swapped1 = false; 
+            ListNode<Job>* current = jobsToSortTitle.getHead(); 
+            while (current && current->next) { 
+                if (strcmp(current->data.jobTitle.c_str(), current->next->data.jobTitle.c_str()) > 0) { 
+                    jobsToSortTitle.swapNodes(current, current->next); 
+                    swapped1 = true; 
+                } 
+                current = current->next; 
+            } 
+        } while (swapped1);
+        auto end1 = chrono::high_resolution_clock::now();
+        chrono::duration<double, milli> duration1 = end1 - start1;
+        cout << "Time taken for Bubble Sort (Jobs by Title): " << duration1.count() << " ms" << endl;
+
+        // Test 2: Sort Jobs by Skill Count
+        CustomLinkedList<Job> jobsToSortSkill = originalJobList;
+        auto start2 = chrono::high_resolution_clock::now();
+        bool swapped2;
+        do { 
+            swapped2 = false; 
+            ListNode<Job>* current = jobsToSortSkill.getHead(); 
+            while (current && current->next) { 
+                if (current->data.skillCount > current->next->data.skillCount) { 
+                    jobsToSortSkill.swapNodes(current, current->next); 
+                    swapped2 = true; 
+                } 
+                current = current->next; 
+            } 
+        } while (swapped2);
+        auto end2 = chrono::high_resolution_clock::now();
+        chrono::duration<double, milli> duration2 = end2 - start2;
+        cout << "Time taken for Bubble Sort (Jobs by Skill Count): " << duration2.count() << " ms" << endl;
+
+        // Test 3: Sort Resumes by Skill Count
+        CustomLinkedList<Resume> resumesToSort = originalResumeList;
+        auto start3 = chrono::high_resolution_clock::now();
+        bool swapped3;
+        do { 
+            swapped3 = false; 
+            ListNode<Resume>* current = resumesToSort.getHead(); 
+            while (current && current->next) { 
+                if (current->data.skillCount > current->next->data.skillCount) { 
+                    resumesToSort.swapNodes(current, current->next); 
+                    swapped3 = true; 
+                } 
+                current = current->next; 
+            } 
+        } while (swapped3);
+        auto end3 = chrono::high_resolution_clock::now();
+        chrono::duration<double, milli> duration3 = end3 - start3;
+        cout << "Time taken for Bubble Sort (Resumes by Skill Count): " << duration3.count() << " ms" << endl;
+
+        // Test 4: Job Matching Speed
+        if (!originalResumeList.empty()) {
+            Resume& testResume = originalResumeList[0];
+            auto start_match = chrono::high_resolution_clock::now();
+            for (int i = 0; i < jobList.getSize(); ++i) {
+                Job& currentJob = jobList[i];
+                int matchingSkills = 0;
+                for (int j = 0; j < testResume.lowerCaseSkills.size(); ++j) {
+                    for (int k = 0; k < currentJob.lowerCaseSkills.size(); ++k) {
+                        if (strcmp(testResume.lowerCaseSkills[j].c_str(), currentJob.lowerCaseSkills[k].c_str()) == 0) { 
+                            matchingSkills++; 
+                            break; 
+                        }
+                    }
+                }
+                int unionSize = testResume.skillCount + currentJob.skillCount - matchingSkills;
+                double score = (unionSize > 0) ? static_cast<double>(matchingSkills) / unionSize : 0.0;
+            }
+            auto end_match = chrono::high_resolution_clock::now();
+            chrono::duration<double, milli> match_duration = end_match - start_match;
+            cout << "Time taken for matching one resume to all jobs: " << match_duration.count() << " ms" << endl;
+        }
+
+        //Test 5：Test Search Job Title
+        if (!originalJobList.empty()) {
+            // Get the title of the VERY LAST 佛 test the worst-case scenario
+            CustomString worstCaseTitle = originalJobList[originalJobList.getSize() - 1].jobTitle;
+    
+            cout << "Searching for last job title: \"" << worstCaseTitle << "\"..." << endl;
+            
+            auto start_search = chrono::high_resolution_clock::now();
+            
+            CustomLinkedList<Job> searchResult = linearSearchJobsByTitle(worstCaseTitle);
+            
+            auto end_search = chrono::high_resolution_clock::now();
+            chrono::duration<double, milli> search_duration = end_search - start_search;
+            
+            cout << "Time taken for Linear Search (Jobs by Title, worst-case): " 
+                 << search_duration.count() << " ms" << endl;
+        }
     }
 };
