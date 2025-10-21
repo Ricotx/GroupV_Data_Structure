@@ -110,4 +110,8 @@ public:
         head = tail = nullptr;
         size = 0;
     }
+
+    ListNode<T>* getHead() const {
+        return head;
+    }
 };

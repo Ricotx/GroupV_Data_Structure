@@ -54,6 +54,8 @@ public:
     CustomLinkedList<Resume>& getResumeList() { return resumeList; }
     CustomArray<CustomString>& getValidSkills() { return validSkills; }
     
+
+//  Codes to test the loading of data into linked list from the csv files -    
     // Status check
     bool isDataLoaded() const { return dataLoaded; }
     
@@ -105,5 +107,69 @@ public:
                 cout << "Middle resume (index 500): " << resumeList[500].resumeSkills[0] << endl;
             }
         }
+    }
+
+
+
+
+// Richard's code for searching algorithms
+    CustomLinkedList<Job> linearSearchJobsByTitle(const CustomString& title){
+        CustomLinkedList<Job> searchJobTitleList;
+        
+        if (!dataLoaded || jobList.empty()){
+            return searchJobTitleList;
+        }
+
+        ListNode<Job>* current = jobList.getHead();
+
+        while (current != nullptr){
+            if (strcmp(current->data.jobTitle.c_str(), title.c_str()) == 0 ){
+                searchJobTitleList.push_back(current->data);
+            }
+            current = current->next;
+        }
+        return searchJobTitleList;
+    }
+
+    CustomLinkedList<Job> linearSearchJobsBySkills(const CustomString& skill){
+        CustomLinkedList<Job> searchJobSkillList;
+        
+        if (!dataLoaded || jobList.empty()){
+            return searchJobSkillList;
+        }
+
+        ListNode<Job>* current = jobList.getHead();
+
+        while (current != nullptr){
+            for (int i = 0; i < current->data.skills.size(); ++i){
+                if (strcmp(current->data.skills[i].c_str(), skill.c_str()) == 0 ){
+                    searchJobSkillList.push_back(current->data);
+                    break;
+                }
+            }
+            current = current->next;
+        }
+        return searchJobSkillList;
+    }
+
+    CustomLinkedList<Resume> linearSearchResumesBySkills(const CustomString& skill){
+        CustomLinkedList<Resume> searchResumeSkillList;
+        
+        if (!dataLoaded || resumeList.empty()){
+            return searchResumeSkillList;
+        }
+
+        ListNode<Resume>* current = resumeList.getHead();
+
+        while (current != nullptr){
+            for (int i = 0; i < current->data.resumeSkills.size(); ++i){
+                if (strcmp(current->data.resumeSkills[i].c_str(), skill.c_str()) == 0 ){
+                    searchResumeSkillList.push_back(current->data);
+                    break;
+                }
+            }
+            current = current->next;
+        }
+        return searchResumeSkillList;
     }
 };
