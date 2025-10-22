@@ -375,8 +375,9 @@ Resume preprocessResumeDescription(const CustomString& rawLine, int id,
     CustomArray<CustomString> rawSkills = extractResumeSkills(lowerLine);
     
     // Step 3: Filter against valid skillset
-    resume.resumeSkills = filterResumeSkills(rawSkills, validSkills);
     resume.skillCount = resume.resumeSkills.size();
+    resume.resumeSkills = filterResumeSkills(rawSkills, validSkills);
+    
     
     // Step 4: Create lowercase skills array
     for (int i = 0; i < resume.resumeSkills.size(); i++) {
