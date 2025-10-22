@@ -39,7 +39,7 @@ public:
             }
         }
 
-        cout << "✅ Built valid skillset with " << skillset.size() << " unique skills.\n";
+        cout << "Built valid skillset with " << skillset.size() << " unique skills.\n";
         return skillset;
     }
 
@@ -64,12 +64,17 @@ public:
             resumeArray.push_back(preprocessResumeDescription(resumeLines[i], i + 1, validSkills));
         }
 
-        cout << "✅ Loaded " << jobArray.getSize() << " jobs and " << resumeArray.getSize() << " resumes." << endl;
+        cout << "Loaded " << jobArray.getSize() << " jobs and " << resumeArray.getSize() << " resumes." << endl;
         return true;
     }
 
     
-    void displaySampleData(int n = 5) const {
+    void displaySampleData(int n = 10) const {
+        cout << "\n=== DATA SUMMARY ===" << endl;
+        cout << "Total Jobs Loaded: " << jobArray.getSize() << endl;
+        cout << "Total Resumes Loaded: " << resumeArray.getSize() << endl;
+        cout << "Displaying " << min(n, jobArray.getSize()) << " jobs and " << min(n, resumeArray.getSize()) << " resumes..." << endl;
+        
         cout << "\n=== SAMPLE JOBS ===" << endl;
         for (int i = 0; i < min(n, jobArray.getSize()); i++)
             jobArray[i].display();
@@ -77,12 +82,23 @@ public:
         cout << "\n=== SAMPLE RESUMES ===" << endl;
         for (int i = 0; i < min(n, resumeArray.getSize()); i++)
             resumeArray[i].display();
+            
+        if (jobArray.getSize() > n || resumeArray.getSize() > n) {
+            cout << "\n... and " << (jobArray.getSize() - n) << " more jobs, " << (resumeArray.getSize() - n) << " more resumes available." << endl;
+        }
     }
 
    
     void bubbleSortJobsByTitle() {
         int n = jobArray.getSize();
+        cout << "Sorting " << n << " jobs by title... This may take a moment." << endl;
+        
         for (int i = 0; i < n - 1; i++) {
+            // Show progress every 1000 iterations
+            if (i % 1000 == 0) {
+                cout << "Progress: " << (i * 100) / (n - 1) << "%" << endl;
+            }
+            
             for (int j = 0; j < n - i - 1; j++) {
                 if (strcmp(jobArray[j].jobTitle.c_str(), jobArray[j + 1].jobTitle.c_str()) > 0) {
                     Job temp = jobArray[j];
@@ -91,11 +107,19 @@ public:
                 }
             }
         }
+        cout << "Sorting complete!" << endl;
     }
 
     void bubbleSortJobsBySkillCount() {
         int n = jobArray.getSize();
+        cout << "Sorting " << n << " jobs by skill count... This may take a moment." << endl;
+        
         for (int i = 0; i < n - 1; i++) {
+            // Show progress every 1000 iterations
+            if (i % 1000 == 0) {
+                cout << "Progress: " << (i * 100) / (n - 1) << "%" << endl;
+            }
+            
             for (int j = 0; j < n - i - 1; j++) {
                 if (jobArray[j].skillCount > jobArray[j + 1].skillCount) {
                     Job temp = jobArray[j];
@@ -104,6 +128,7 @@ public:
                 }
             }
         }
+        cout << "Sorting complete!" << endl;
     }
 
    
