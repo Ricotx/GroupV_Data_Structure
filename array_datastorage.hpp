@@ -152,6 +152,162 @@ public:
         cout << "Sorting complete!" << endl;
     }
 
+    // QuickSort implementation for jobs by skill count
+    void quickSortJobsBySkillCount() {
+        cout << "QuickSort: Sorting " << jobArray.getSize() << " jobs by skill count..." << endl;
+        quickSortJobsBySkillCountHelper(0, jobArray.getSize() - 1);
+        cout << "QuickSort complete!" << endl;
+    }
+
+private:
+    void quickSortJobsBySkillCountHelper(int low, int high) {
+        if (low < high) {
+            int pivotIndex = partitionJobsBySkillCount(low, high);
+            quickSortJobsBySkillCountHelper(low, pivotIndex - 1);
+            quickSortJobsBySkillCountHelper(pivotIndex + 1, high);
+        }
+    }
+
+    int partitionJobsBySkillCount(int low, int high) {
+        int pivot = jobArray[high].skillCount;
+        int i = low - 1;
+        
+        for (int j = low; j < high; j++) {
+            if (jobArray[j].skillCount <= pivot) {
+                i++;
+                Job temp = jobArray[i];
+                jobArray[i] = jobArray[j];
+                jobArray[j] = temp;
+            }
+        }
+        
+        Job temp = jobArray[i + 1];
+        jobArray[i + 1] = jobArray[high];
+        jobArray[high] = temp;
+        
+        return i + 1;
+    }
+
+public:
+    // MergeSort implementation for jobs by skill count
+    void mergeSortJobsBySkillCount() {
+        cout << "MergeSort: Sorting " << jobArray.getSize() << " jobs by skill count..." << endl;
+        mergeSortJobsBySkillCountHelper(0, jobArray.getSize() - 1);
+        cout << "MergeSort complete!" << endl;
+    }
+
+private:
+    void mergeSortJobsBySkillCountHelper(int left, int right) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+            mergeSortJobsBySkillCountHelper(left, mid);
+            mergeSortJobsBySkillCountHelper(mid + 1, right);
+            mergeJobsBySkillCount(left, mid, right);
+        }
+    }
+
+    void mergeJobsBySkillCount(int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+        
+        // Create temporary arrays
+        Job* leftArray = new Job[n1];
+        Job* rightArray = new Job[n2];
+        
+        // Copy data to temporary arrays
+        for (int i = 0; i < n1; i++) {
+            leftArray[i] = jobArray[left + i];
+        }
+        for (int j = 0; j < n2; j++) {
+            rightArray[j] = jobArray[mid + 1 + j];
+        }
+        
+        // Merge the temporary arrays back
+        int i = 0, j = 0, k = left;
+        
+        while (i < n1 && j < n2) {
+            if (leftArray[i].skillCount <= rightArray[j].skillCount) {
+                jobArray[k] = leftArray[i];
+                i++;
+            } else {
+                jobArray[k] = rightArray[j];
+                j++;
+            }
+            k++;
+        }
+        
+        // Copy remaining elements
+        while (i < n1) {
+            jobArray[k] = leftArray[i];
+            i++;
+            k++;
+        }
+        while (j < n2) {
+            jobArray[k] = rightArray[j];
+            j++;
+            k++;
+        }
+        
+        // Clean up temporary arrays
+        delete[] leftArray;
+        delete[] rightArray;
+    }
+
+public:
+    // Memory estimation functions
+    size_t estimateMemoryUsage() const {
+        size_t totalMemory = 0;
+        
+        // Job array memory
+        totalMemory += jobArray.getCapacity() * sizeof(Job);
+        
+        // Resume array memory
+        totalMemory += resumeArray.getCapacity() * sizeof(Resume);
+        
+        // Additional memory for strings and arrays within Job/Resume objects
+        for (int i = 0; i < jobArray.getSize(); i++) {
+            const Job& job = jobArray[i];
+            totalMemory += job.jobTitle.size() + 1; // +1 for null terminator
+            totalMemory += job.fullDescription.size() + 1;
+            totalMemory += job.lowerCaseTitle.size() + 1;
+            totalMemory += job.jobCategory.size() + 1;
+            
+            // Skills arrays
+            for (int j = 0; j < job.skills.size(); j++) {
+                totalMemory += job.skills[j].size() + 1;
+            }
+            for (int j = 0; j < job.lowerCaseSkills.size(); j++) {
+                totalMemory += job.lowerCaseSkills[j].size() + 1;
+            }
+        }
+        
+        for (int i = 0; i < resumeArray.getSize(); i++) {
+            const Resume& resume = resumeArray[i];
+            totalMemory += resume.fullDescription.size() + 1;
+            
+            // Resume skills arrays
+            for (int j = 0; j < resume.resumeSkills.size(); j++) {
+                totalMemory += resume.resumeSkills[j].size() + 1;
+            }
+            for (int j = 0; j < resume.lowerCaseSkills.size(); j++) {
+                totalMemory += resume.lowerCaseSkills[j].size() + 1;
+            }
+        }
+        
+        return totalMemory;
+    }
+    
+    void printMemoryStats() const {
+        size_t memoryUsage = estimateMemoryUsage();
+        cout << "\n=== MEMORY USAGE STATISTICS ===" << endl;
+        cout << "Total Memory Usage: " << memoryUsage << " bytes (" << (memoryUsage / 1024.0 / 1024.0) << " MB)" << endl;
+        cout << "Job Array Capacity: " << jobArray.getCapacity() << " elements" << endl;
+        cout << "Job Array Size: " << jobArray.getSize() << " elements" << endl;
+        cout << "Resume Array Capacity: " << resumeArray.getCapacity() << " elements" << endl;
+        cout << "Resume Array Size: " << resumeArray.getSize() << " elements" << endl;
+        cout << "Memory Efficiency: " << ((double)(jobArray.getSize() + resumeArray.getSize()) / (jobArray.getCapacity() + resumeArray.getCapacity())) * 100 << "%" << endl;
+    }
+
    
     Job* linearSearchJobByTitle(const CustomString& title) {
         for (int i = 0; i < jobArray.getSize(); i++) {

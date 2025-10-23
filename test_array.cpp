@@ -6,14 +6,19 @@
 
 using namespace std;
 
+// Forward declarations
+void runSortPerformance(ArrayDataStorage& storage);
+void runSearchPerformance(ArrayDataStorage& storage);
+
 void displayArrayMainMenu() {
     cout << "\n=== Job Matching System Menu ===" << endl;
     cout << "1. Load Data" << endl;
     cout << "2. Display Sample Data" << endl;
-    cout << "3. Sort Data (Bubble Sort)" << endl;
+    cout << "3. Sort Data (Multiple Algorithms)" << endl;
     cout << "4. Search Data (Linear Search)" << endl;
     cout << "5. Find Job Matches for Resume" << endl;
     cout << "6. Performance Tests" << endl;
+    cout << "7. Memory Usage Statistics" << endl;
     cout << "0. Exit" << endl;
     cout << "=================================" << endl;
     cout << "Enter your choice: ";
@@ -103,10 +108,13 @@ void showDataStatistics(ArrayDataStorage& storage) {
 // --- Sort Sub-Menu (Like Linked List) ---
 
 void displayArraySortMenu() {
-    cout << "\n--- Bubble Sort Menu ---" << endl;
-    cout << "1. Sort Jobs by Title (A-Z)" << endl;
-    cout << "2. Sort Jobs by Skill Count (Lowest to Highest)" << endl;
-    cout << "3. Sort Resumes by Skill Count (Lowest to Highest)" << endl;
+    cout << "\n--- Sorting Algorithms Menu ---" << endl;
+    cout << "1. Sort Jobs by Title (A-Z) - Bubble Sort" << endl;
+    cout << "2. Sort Jobs by Skill Count - Bubble Sort" << endl;
+    cout << "3. Sort Jobs by Skill Count - Quick Sort" << endl;
+    cout << "4. Sort Jobs by Skill Count - Merge Sort" << endl;
+    cout << "5. Sort Resumes by Skill Count - Bubble Sort" << endl;
+    cout << "6. Performance Comparison (All Sorting Algorithms)" << endl;
     cout << "0. Back to Main Menu" << endl;
     cout << "----------------------" << endl;
     cout << "Enter your choice: ";
@@ -138,10 +146,20 @@ void handleSortMenu(ArrayDataStorage& storage) {
                 break;
             case 2:
                 storage.bubbleSortJobsBySkillCount();
-                cout << "Jobs sorted by skill count." << endl;
+                cout << "Jobs sorted by skill count (Bubble Sort)." << endl;
                 storage.displaySampleData(5);
                 break;
             case 3:
+                storage.quickSortJobsBySkillCount();
+                cout << "Jobs sorted by skill count (Quick Sort)." << endl;
+                storage.displaySampleData(5);
+                break;
+            case 4:
+                storage.mergeSortJobsBySkillCount();
+                cout << "Jobs sorted by skill count (Merge Sort)." << endl;
+                storage.displaySampleData(5);
+                break;
+            case 5:
                 storage.bubbleSortResumesBySkillCount();
                 cout << "Resumes sorted by skill count." << endl;
                 // Display sample resumes after sorting
@@ -150,6 +168,9 @@ void handleSortMenu(ArrayDataStorage& storage) {
                     cout << "Resume " << i + 1 << ": ID=" << storage.getResumeArray()[i].id 
                          << ", Skills=" << storage.getResumeArray()[i].skillCount << endl;
                 }
+                break;
+            case 6:
+                runSortPerformance(storage);
                 break;
             case 0:
                 cout << "Returning to main menu..." << endl;
@@ -323,12 +344,75 @@ void runFilterDemo(ArrayDataStorage& storage) {
 
 // Performance: sort by title timing
 void runSortPerformance(ArrayDataStorage& storage) {
-    if (storage.getJobArray().getSize() == 0) { cout << "Load data first." << endl; return; }
+    if (storage.getJobArray().getSize() == 0) {
+        cout << "No data loaded for performance test." << endl;
+        return;
+    }
+
+    cout << "\n=== SORTING ALGORITHM PERFORMANCE COMPARISON ===" << endl;
+    cout << "Dataset size: " << storage.getJobArray().getSize() << " jobs" << endl;
+    
+    // Create copies for fair comparison
+    ArrayDataStorage bubbleCopy, quickCopy, mergeCopy;
+    bubbleCopy.loadArrayData("csv/job_description.csv", "csv/resume.csv");
+    quickCopy.loadArrayData("csv/job_description.csv", "csv/resume.csv");
+    mergeCopy.loadArrayData("csv/job_description.csv", "csv/resume.csv");
+    
+    cout << "\nTesting all three sorting algorithms..." << endl;
+    
+    // Test Bubble Sort
+    cout << "\n1. BUBBLE SORT:" << endl;
     auto start = chrono::high_resolution_clock::now();
-    storage.bubbleSortJobsByTitle();
+    bubbleCopy.bubbleSortJobsBySkillCount();
     auto end = chrono::high_resolution_clock::now();
-    auto ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-    cout << "Bubble Sort by Title took: " << ms << " ms" << endl;
+    auto bubbleTime = chrono::duration_cast<chrono::milliseconds>(end - start);
+    cout << "Bubble Sort Time: " << bubbleTime.count() << " ms" << endl;
+    
+    // Test Quick Sort
+    cout << "\n2. QUICK SORT:" << endl;
+    start = chrono::high_resolution_clock::now();
+    quickCopy.quickSortJobsBySkillCount();
+    end = chrono::high_resolution_clock::now();
+    auto quickTime = chrono::duration_cast<chrono::milliseconds>(end - start);
+    cout << "Quick Sort Time: " << quickTime.count() << " ms" << endl;
+    
+    // Test Merge Sort
+    cout << "\n3. MERGE SORT:" << endl;
+    start = chrono::high_resolution_clock::now();
+    mergeCopy.mergeSortJobsBySkillCount();
+    end = chrono::high_resolution_clock::now();
+    auto mergeTime = chrono::duration_cast<chrono::milliseconds>(end - start);
+    cout << "Merge Sort Time: " << mergeTime.count() << " ms" << endl;
+    
+    // Performance Summary
+    cout << "\n=== PERFORMANCE SUMMARY ===" << endl;
+    cout << "Bubble Sort: " << bubbleTime.count() << " ms (O(n²))" << endl;
+    cout << "Quick Sort:  " << quickTime.count() << " ms (O(n log n) average)" << endl;
+    cout << "Merge Sort:  " << mergeTime.count() << " ms (O(n log n))" << endl;
+    
+    // Calculate speedup
+    if (bubbleTime.count() > 0) {
+        double quickSpeedup = (double)bubbleTime.count() / quickTime.count();
+        double mergeSpeedup = (double)bubbleTime.count() / mergeTime.count();
+        cout << "\nSpeedup vs Bubble Sort:" << endl;
+        cout << "Quick Sort: " << fixed << setprecision(2) << quickSpeedup << "x faster" << endl;
+        cout << "Merge Sort: " << fixed << setprecision(2) << mergeSpeedup << "x faster" << endl;
+    }
+    
+    // Verify all sorts produce same result
+    bool resultsMatch = true;
+    for (int i = 0; i < bubbleCopy.getJobArray().getSize(); i++) {
+        if (bubbleCopy.getJobArray()[i].skillCount != quickCopy.getJobArray()[i].skillCount ||
+            bubbleCopy.getJobArray()[i].skillCount != mergeCopy.getJobArray()[i].skillCount) {
+            resultsMatch = false;
+            break;
+        }
+    }
+    cout << "\nSorting Verification: " << (resultsMatch ? "ALL ALGORITHMS PRODUCE IDENTICAL RESULTS" : "ERROR - Results don't match") << endl;
+    
+    // Memory usage comparison
+    cout << "\n=== MEMORY USAGE COMPARISON ===" << endl;
+    bubbleCopy.printMemoryStats();
 }
 
 // Performance: linear vs binary search timing
@@ -427,21 +511,28 @@ void runArrayMenu() {
                     }
                 }
                 break;
-            case 6:
-                if (storage.getJobArray().getSize() == 0) {
-                    cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
-                } else {
-                    cout << "\n[Executing: Full Performance Test Suite]" << endl;
-                    runSortPerformance(storage);
-                    runSearchPerformance(storage);
-                }
-                break;
-            case 0:
-                cout << "\nExiting Job Matching System. Goodbye!" << endl;
-                break;
-            default:
-                cout << "\n[INVALID CHOICE] Please select a valid option (0-6)." << endl;
-                break;
+                   case 6:
+                       if (storage.getJobArray().getSize() == 0) {
+                           cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+                       } else {
+                           cout << "\n[Executing: Full Performance Test Suite]" << endl;
+                           runSortPerformance(storage);
+                           runSearchPerformance(storage);
+                       }
+                       break;
+                   case 7:
+                       if (storage.getJobArray().getSize() == 0) {
+                           cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+                       } else {
+                           storage.printMemoryStats();
+                       }
+                       break;
+                   case 0:
+                       cout << "\nExiting Job Matching System. Goodbye!" << endl;
+                       break;
+                   default:
+                       cout << "\n[INVALID CHOICE] Please select a valid option (0-7)." << endl;
+                       break;
         }
     } while (choice != 0);
 }

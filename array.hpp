@@ -66,7 +66,25 @@ public:
     }
 
     int getSize() const { return size; }
+    int getCapacity() const { return capacity; }
     bool empty() const { return size == 0; }
+
+    void remove(int index) {
+        if (index < 0 || index >= size)
+            throw out_of_range("Index out of range");
+        
+        // Shift elements left
+        for (int i = index; i < size - 1; i++) {
+            data[i] = data[i + 1];
+        }
+        size--;
+        
+        // Shrink capacity if too much unused space
+        if (size > 0 && size < capacity / 4) {
+            int newCapacity = capacity / 2;
+            resize(newCapacity);
+        }
+    }
 
     void clear() {
         delete[] data;
