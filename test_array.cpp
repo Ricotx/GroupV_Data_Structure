@@ -379,32 +379,81 @@ void runFilterDemo(ArrayDataStorage& storage) {
 
 // Performance: sort by title timing
 
-// Performance: linear vs binary search timing
+// Performance: comprehensive sorting and matching timing
 void runSearchPerformance(ArrayDataStorage& storage) {
-    if (storage.getJobArray().getSize() == 0) { cout << "Load data first." << endl; return; }
+    if (storage.getJobArray().getSize() == 0) { 
+        cout << "Load data first." << endl; 
+        return; 
+    }
 
-    // Ensure sorted for binary search
+    cout << "\n=== PERFORMANCE TEST RESULTS ===" << endl;
+    cout << "Testing 4 key operations with timing measurements..." << endl;
+    cout << "=========================================" << endl;
+
+    // 1. Sort Jobs by Title (A-Z) - Bubble Sort
+    cout << "\n1. Testing: Sort Jobs by Title (A-Z) - Bubble Sort" << endl;
+    auto start1 = chrono::high_resolution_clock::now();
     storage.bubbleSortJobsByTitle();
+    auto end1 = chrono::high_resolution_clock::now();
+    auto duration1 = chrono::duration_cast<chrono::milliseconds>(end1 - start1);
+    cout << "   ✓ Completed in: " << duration1.count() << " ms" << endl;
 
-    // Pick a target: middle element title (exists case)
-    int midIdx = storage.getJobArray().getSize() / 2;
-    CustomString target = storage.getJobArray()[midIdx].jobTitle;
+    // 2. Sort Jobs by Skill Count - Bubble Sort
+    cout << "\n2. Testing: Sort Jobs by Skill Count - Bubble Sort" << endl;
+    auto start2 = chrono::high_resolution_clock::now();
+    storage.bubbleSortJobsBySkillCount();
+    auto end2 = chrono::high_resolution_clock::now();
+    auto duration2 = chrono::duration_cast<chrono::milliseconds>(end2 - start2);
+    cout << "   ✓ Completed in: " << duration2.count() << " ms" << endl;
 
-    // Linear search timing
-    auto t1 = chrono::high_resolution_clock::now();
-    Job* lf = storage.linearSearchJobByTitle(target);
-    auto t2 = chrono::high_resolution_clock::now();
+    // 3. Sort Resumes by Skill Count - Bubble Sort
+    cout << "\n3. Testing: Sort Resumes by Skill Count - Bubble Sort" << endl;
+    auto start3 = chrono::high_resolution_clock::now();
+    storage.bubbleSortResumesBySkillCount();
+    auto end3 = chrono::high_resolution_clock::now();
+    auto duration3 = chrono::duration_cast<chrono::milliseconds>(end3 - start3);
+    cout << "   ✓ Completed in: " << duration3.count() << " ms" << endl;
 
-    // Binary search timing
-    auto t3 = chrono::high_resolution_clock::now();
-    Job* bf = storage.binarySearchJobByTitle(target);
-    auto t4 = chrono::high_resolution_clock::now();
+    // 4. Job Matching with Weighted Scoring
+    cout << "\n4. Testing: Job Matching with Weighted Scoring" << endl;
+    
+    // Ask user for resume index
+    int resumeIndex;
+    cout << "   Enter resume index for matching (0 to " 
+         << storage.getResumeArray().getSize() - 1 << "): ";
+    
+    if (!(cin >> resumeIndex)) {
+        cout << "   Invalid input. Using resume index 0." << endl;
+        resumeIndex = 0;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+    
+    if (resumeIndex < 0 || resumeIndex >= storage.getResumeArray().getSize()) {
+        cout << "   Invalid index. Using resume index 0." << endl;
+        resumeIndex = 0;
+    }
 
-    auto linMs = chrono::duration_cast<chrono::microseconds>(t2 - t1).count();
-    auto binMs = chrono::duration_cast<chrono::microseconds>(t4 - t3).count();
+    auto start4 = chrono::high_resolution_clock::now();
+    storage.findTopMatchesForResume(storage.getResumeArray()[resumeIndex], 5);
+    auto end4 = chrono::high_resolution_clock::now();
+    auto duration4 = chrono::duration_cast<chrono::milliseconds>(end4 - start4);
+    cout << "   ✓ Completed in: " << duration4.count() << " ms" << endl;
 
-    cout << "Linear Search time: " << linMs << " µs | Found? " << (lf != nullptr) << endl;
-    cout << "Binary Search time: " << binMs << " µs | Found? " << (bf != nullptr) << endl;
+    // Summary Results
+    cout << "\n=========================================" << endl;
+    cout << "=== PERFORMANCE SUMMARY ===" << endl;
+    cout << "=========================================" << endl;
+    cout << "1. Sort Jobs by Title (Bubble Sort):     " << duration1.count() << " ms" << endl;
+    cout << "2. Sort Jobs by Skill Count (Bubble):    " << duration2.count() << " ms" << endl;
+    cout << "3. Sort Resumes by Skill Count (Bubble): " << duration3.count() << " ms" << endl;
+    cout << "4. Job Matching (Weighted Scoring):      " << duration4.count() << " ms" << endl;
+    cout << "=========================================" << endl;
+    
+    // Calculate total time
+    long totalTime = duration1.count() + duration2.count() + duration3.count() + duration4.count();
+    cout << "Total execution time: " << totalTime << " ms" << endl;
+    cout << "=========================================" << endl;
 }
 
 // Main Function (Like Linked List)
