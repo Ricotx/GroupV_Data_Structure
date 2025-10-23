@@ -132,27 +132,6 @@ public:
         cout << "Sorting complete!" << endl;
     }
 
-    void bubbleSortResumesBySkillCount() {
-        int n = resumeArray.getSize();
-        cout << "Sorting " << n << " resumes by skill count... This may take a moment." << endl;
-        
-        for (int i = 0; i < n - 1; i++) {
-            // Show progress every 1000 iterations
-            if (i % 1000 == 0) {
-                cout << "Progress: " << (i * 100) / (n - 1) << "%" << endl;
-            }
-            
-            for (int j = 0; j < n - i - 1; j++) {
-                if (resumeArray[j].skillCount > resumeArray[j + 1].skillCount) {
-                    Resume temp = resumeArray[j];
-                    resumeArray[j] = resumeArray[j + 1];
-                    resumeArray[j + 1] = temp;
-                }
-            }
-        }
-        cout << "Sorting complete!" << endl;
-    }
-
     // QuickSort implementation for jobs by skill count
     void quickSortJobsBySkillCount() {
         cout << "QuickSort: Sorting " << jobArray.getSize() << " jobs by skill count..." << endl;
