@@ -98,8 +98,10 @@ public:
         auto start = chrono::high_resolution_clock::now();
         
         for (int i = 0; i < n - 1; i++) {
-            // Show progress every 1000 iterations
-            if (i % 1000 == 0) {
+            bool swapped = false;
+            
+            // Show progress every 5000 iterations for large datasets
+            if (i % 5000 == 0) {
                 cout << "Progress: " << (i * 100) / (n - 1) << "%" << endl;
             }
             
@@ -108,7 +110,14 @@ public:
                     Job temp = jobArray[j];
                     jobArray[j] = jobArray[j + 1];
                     jobArray[j + 1] = temp;
+                    swapped = true;
                 }
+            }
+            
+            // Early termination if no swaps occurred
+            if (!swapped) {
+                cout << "Early termination: Array already sorted!" << endl;
+                break;
             }
         }
         
@@ -125,8 +134,10 @@ public:
         auto start = chrono::high_resolution_clock::now();
         
         for (int i = 0; i < n - 1; i++) {
-            // Show progress every 1000 iterations
-            if (i % 1000 == 0) {
+            bool swapped = false;
+            
+            // Show progress every 5000 iterations for large datasets
+            if (i % 5000 == 0) {
                 cout << "Progress: " << (i * 100) / (n - 1) << "%" << endl;
             }
             
@@ -135,7 +146,14 @@ public:
                     Job temp = jobArray[j];
                     jobArray[j] = jobArray[j + 1];
                     jobArray[j + 1] = temp;
+                    swapped = true;
                 }
+            }
+            
+            // Early termination if no swaps occurred
+            if (!swapped) {
+                cout << "Early termination: Array already sorted!" << endl;
+                break;
             }
         }
         
@@ -152,8 +170,10 @@ public:
         auto start = chrono::high_resolution_clock::now();
         
         for (int i = 0; i < n - 1; i++) {
-            // Show progress every 1000 iterations
-            if (i % 1000 == 0) {
+            bool swapped = false;
+            
+            // Show progress every 5000 iterations for large datasets
+            if (i % 5000 == 0) {
                 cout << "Progress: " << (i * 100) / (n - 1) << "%" << endl;
             }
             
@@ -162,7 +182,14 @@ public:
                     Resume temp = resumeArray[j];
                     resumeArray[j] = resumeArray[j + 1];
                     resumeArray[j + 1] = temp;
+                    swapped = true;
                 }
+            }
+            
+            // Early termination if no swaps occurred
+            if (!swapped) {
+                cout << "Early termination: Array already sorted!" << endl;
+                break;
             }
         }
         
@@ -174,9 +201,7 @@ public:
 
     // QuickSort implementation for jobs by skill count
     void quickSortJobsBySkillCount() {
-        cout << "QuickSort: Sorting " << jobArray.getSize() << " jobs by skill count..." << endl;
         quickSortJobsBySkillCountHelper(0, jobArray.getSize() - 1);
-        cout << "QuickSort complete!" << endl;
     }
 
 private:
@@ -211,9 +236,7 @@ private:
 public:
     // MergeSort implementation for jobs by skill count
     void mergeSortJobsBySkillCount() {
-        cout << "MergeSort: Sorting " << jobArray.getSize() << " jobs by skill count..." << endl;
         mergeSortJobsBySkillCountHelper(0, jobArray.getSize() - 1);
-        cout << "MergeSort complete!" << endl;
     }
 
 private:
