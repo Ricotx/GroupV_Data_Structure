@@ -113,7 +113,8 @@ void displayArraySortMenu() {
     cout << "2. Sort Jobs by Skill Count - Bubble Sort" << endl;
     cout << "3. Sort Jobs by Skill Count - Quick Sort" << endl;
     cout << "4. Sort Jobs by Skill Count - Merge Sort" << endl;
-    cout << "5. Performance Comparison (All Sorting Algorithms)" << endl;
+    cout << "5. Sort Resumes by Skill Count - Bubble Sort" << endl;
+    cout << "6. Performance Comparison (All Sorting Algorithms)" << endl;
     cout << "0. Back to Main Menu" << endl;
     cout << "----------------------" << endl;
     cout << "Enter your choice: ";
@@ -159,6 +160,16 @@ void handleSortMenu(ArrayDataStorage& storage) {
                 storage.displaySampleData(5);
                 break;
             case 5:
+                storage.bubbleSortResumesBySkillCount();
+                cout << "Resumes sorted by skill count." << endl;
+                // Display sample resumes after sorting
+                cout << "\n=== Sample Resumes After Sorting ===" << endl;
+                for (int i = 0; i < min(5, storage.getResumeArray().getSize()); i++) {
+                    cout << "Resume " << i + 1 << ": ID=" << storage.getResumeArray()[i].id 
+                         << ", Skills=" << storage.getResumeArray()[i].skillCount << endl;
+                }
+                break;
+            case 6:
                 runSortPerformance(storage);
                 break;
             case 0:
