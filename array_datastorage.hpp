@@ -5,6 +5,7 @@
 #include "preprocessor.hpp"
 #include "matching.hpp"
 #include <iostream>
+#include <iomanip>
 #include <ctime>
 #include <cstring>
 
@@ -433,7 +434,7 @@ public:
             matches.push_back(job);
         }
 
-        
+        // Sort by match score (bubble sort)
         for (int i = 0; i < matches.getSize() - 1; i++) {
             for (int j = 0; j < matches.getSize() - i - 1; j++) {
                 if (matches[j].matchScore < matches[j + 1].matchScore) {
@@ -444,9 +445,31 @@ public:
             }
         }
 
-        cout << "\n=== Top " << topN << " Matches for Resume " << resume.id << " ===" << endl;
-        for (int i = 0; i < min(topN, matches.getSize()); i++) {
-            cout << i + 1 << ". " << matches[i].jobTitle << " (Score: " << matches[i].matchScore << ")\n";
+        cout << "\n=== Top " << topN << " Job Matches for Resume " << resume.id << " ===" << endl;
+        cout << "Resume Skills: ";
+        for (int i = 0; i < resume.resumeSkills.size(); i++) {
+            cout << resume.resumeSkills[i];
+            if (i < resume.resumeSkills.size() - 1) cout << ", ";
+        }
+        cout << endl << endl;
+        
+        // Display top N different jobs with full details
+        int displayed = 0;
+        for (int i = 0; i < matches.getSize() && displayed < topN; i++) {
+            cout << "Match " << (displayed + 1) << ":" << endl;
+            cout << "Job ID: " << matches[i].id << endl;
+            cout << "Title: " << matches[i].jobTitle << endl;
+            cout << "Skills (" << matches[i].skillCount << "): ";
+            for (int j = 0; j < matches[i].skills.size(); j++) {
+                cout << matches[i].skills[j];
+                if (j < matches[i].skills.size() - 1) cout << ", ";
+            }
+            cout << endl;
+            cout << "Category: " << matches[i].jobCategory << endl;
+            cout << "Priority: " << matches[i].priority << endl;
+            cout << "Match Score: " << fixed << setprecision(3) << matches[i].matchScore << endl;
+            cout << "---" << endl;
+            displayed++;
         }
     }
 
