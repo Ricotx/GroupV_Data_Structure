@@ -6,21 +6,16 @@
 
 using namespace std;
 
-void displayMenu() {
-    cout << "\n=== ARRAY TEAM TEST MENU ===" << endl;
+void displayArrayMainMenu() {
+    cout << "\n=== Job Matching System Menu ===" << endl;
     cout << "1. Load Data" << endl;
     cout << "2. Display Sample Data" << endl;
-    cout << "3. Rank Jobs by Keyword Overlap (for a resume)" << endl;
-    cout << "4. Bubble Sort Jobs by Title" << endl;
-    cout << "5. Bubble Sort Jobs by Skill Count" << endl;
-    cout << "6. Linear Search Job by Title" << endl;
-    cout << "7. Binary Search Job by Title (requires sorted by title)" << endl;
-    cout << "8. Weighted Matching: Top Matches for a Resume" << endl;
-    cout << "9. Filter Jobs by Title Keyword" << endl;
-    cout << "10. Performance: Sort (Title) Time" << endl;
-    cout << "11. Performance: Linear vs Binary Search Time" << endl;
+    cout << "3. Sort Data (Bubble Sort)" << endl;
+    cout << "4. Search Data (Linear Search)" << endl;
+    cout << "5. Find Job Matches for Resume" << endl;
+    cout << "6. Performance Tests" << endl;
     cout << "0. Exit" << endl;
-    cout << "=============================" << endl;
+    cout << "=================================" << endl;
     cout << "Enter your choice: ";
 }
 
@@ -42,12 +37,121 @@ void runKeywordMatchingDemo(ArrayDataStorage& storage) {
     const Resume& sampleResume = storage.getResumeArray()[resumeIndex];
     storage.rankJobsForResumeByKeywords(sampleResume);
 
-    cout << "\nTop 5 jobs by simple keyword overlap for resume " << sampleResume.id << ":" << endl;
+    cout << "\n=== Top 5 Jobs by Keyword Overlap for Resume " << sampleResume.id << " ===" << endl;
+    cout << "Resume Skills: ";
+    for (int i = 0; i < sampleResume.resumeSkills.size(); i++) {
+        cout << sampleResume.resumeSkills[i];
+        if (i < sampleResume.resumeSkills.size() - 1) cout << ", ";
+    }
+    cout << endl;
+    cout << "=========================================" << endl;
+    
     int top = min(5, storage.getJobArray().getSize());
     for (int i = 0; i < top; i++) {
         const Job& j = storage.getJobArray()[i];
-        cout << (i + 1) << ". " << j.jobTitle << " | keywordScore=" << j.matchScore << endl;
+        cout << "\nJob Match #" << (i + 1) << " (Keyword Score: " << j.matchScore << "):" << endl;
+        j.display();
     }
+}
+
+// Show comprehensive data statistics
+void showDataStatistics(ArrayDataStorage& storage) {
+    if (storage.getJobArray().getSize() == 0) {
+        cout << "No data loaded." << endl;
+        return;
+    }
+    
+    cout << "\n=== COMPREHENSIVE DATA STATISTICS ===" << endl;
+    cout << "Total Jobs: " << storage.getJobArray().getSize() << endl;
+    cout << "Total Resumes: " << storage.getResumeArray().getSize() << endl;
+    
+    // Job statistics
+    int totalJobSkills = 0;
+    int maxJobSkills = 0;
+    int minJobSkills = INT_MAX;
+    for (int i = 0; i < storage.getJobArray().getSize(); i++) {
+        int skillCount = storage.getJobArray()[i].skillCount;
+        totalJobSkills += skillCount;
+        maxJobSkills = max(maxJobSkills, skillCount);
+        minJobSkills = min(minJobSkills, skillCount);
+    }
+    
+    cout << "\n--- JOB STATISTICS ---" << endl;
+    cout << "Average Skills per Job: " << (double)totalJobSkills / storage.getJobArray().getSize() << endl;
+    cout << "Max Skills in a Job: " << maxJobSkills << endl;
+    cout << "Min Skills in a Job: " << minJobSkills << endl;
+    
+    // Resume statistics
+    int totalResumeSkills = 0;
+    int maxResumeSkills = 0;
+    int minResumeSkills = INT_MAX;
+    for (int i = 0; i < storage.getResumeArray().getSize(); i++) {
+        int skillCount = storage.getResumeArray()[i].skillCount;
+        totalResumeSkills += skillCount;
+        maxResumeSkills = max(maxResumeSkills, skillCount);
+        minResumeSkills = min(minResumeSkills, skillCount);
+    }
+    
+    cout << "\n--- RESUME STATISTICS ---" << endl;
+    cout << "Average Skills per Resume: " << (double)totalResumeSkills / storage.getResumeArray().getSize() << endl;
+    cout << "Max Skills in a Resume: " << maxResumeSkills << endl;
+    cout << "Min Skills in a Resume: " << minResumeSkills << endl;
+    
+    cout << "\n=== END STATISTICS ===" << endl;
+}
+
+// --- Sort Sub-Menu (Like Linked List) ---
+
+void displayArraySortMenu() {
+    cout << "\n--- Bubble Sort Menu ---" << endl;
+    cout << "1. Sort Jobs by Title (A-Z)" << endl;
+    cout << "2. Sort Jobs by Skill Count (Lowest to Highest)" << endl;
+    cout << "3. Sort Resumes by Skill Count (Lowest to Highest)" << endl;
+    cout << "0. Back to Main Menu" << endl;
+    cout << "----------------------" << endl;
+    cout << "Enter your choice: ";
+}
+
+void handleSortMenu(ArrayDataStorage& storage) {
+    if (storage.getJobArray().getSize() == 0) {
+        cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+        return;
+    }
+
+    int choice;
+    do {
+        displayArraySortMenu();
+        
+        if (!(cin >> choice)) {
+            cout << "\n[INVALID INPUT] Please enter a number." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            choice = -1;
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                storage.bubbleSortJobsByTitle();
+                cout << "Jobs sorted by title." << endl;
+                storage.displaySampleData(5);
+                break;
+            case 2:
+                storage.bubbleSortJobsBySkillCount();
+                cout << "Jobs sorted by skill count." << endl;
+                storage.displaySampleData(5);
+                break;
+            case 3:
+                // Note: Array implementation doesn't have resume sorting yet
+                cout << "Resume sorting not implemented in Array version." << endl;
+                break;
+            case 0:
+                cout << "Returning to main menu..." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    } while (choice != 0);
 }
 
 // Demo: Linear search by job title
@@ -66,10 +170,61 @@ void runLinearSearchDemo(ArrayDataStorage& storage) {
     Job* found = storage.linearSearchJobByTitle(title);
     cout << "\nLinear search for title: '" << title << "'\n";
     if (found) {
-        cout << "Found job with id=" << found->id << " and title=" << found->jobTitle << endl;
+        cout << "\n[SUCCESS] Found job matching \"" << title << "\":" << endl;
+        cout << "=========================================" << endl;
+        found->display();
     } else {
-        cout << "Job not found" << endl;
+        cout << "[NOT FOUND] No job with the title \"" << title << "\" was found." << endl;
     }
+}
+
+// --- Search Sub-Menu (Like Linked List) ---
+
+void displayArraySearchMenu() {
+    cout << "\n--- Linear Search Menu ---" << endl;
+    cout << "1. Search Jobs by Title" << endl;
+    cout << "2. Search Jobs by Skill" << endl;
+    cout << "3. Search Resumes by Skill" << endl;
+    cout << "0. Back to Main Menu" << endl;
+    cout << "--------------------------" << endl;
+    cout << "Enter your choice: ";
+}
+
+void handleSearchMenu(ArrayDataStorage& storage) {
+    if (storage.getJobArray().getSize() == 0) {
+        cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+        return;
+    }
+
+    int choice;
+    do {
+        displayArraySearchMenu();
+        
+        if (!(cin >> choice)) {
+            cout << "\n[INVALID INPUT] Please enter a number." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            choice = -1;
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                runLinearSearchDemo(storage);
+                break;
+            case 2:
+                cout << "Job skill search not implemented in Array version." << endl;
+                break;
+            case 3:
+                cout << "Resume skill search not implemented in Array version." << endl;
+                break;
+            case 0:
+                cout << "Returning to main menu..." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    } while (choice != 0);
 }
 
 // Demo: Filter by title keyword
@@ -84,9 +239,17 @@ void runFilterDemo(ArrayDataStorage& storage) {
     getline(cin, keyword);
     CustomString key(keyword.c_str());
     auto filtered = storage.filterJobsByTitleKeyword(key);
-    cout << "Found " << filtered.getSize() << " jobs with keyword '" << keyword << "' in title." << endl;
-    for (int i = 0; i < min(5, filtered.getSize()); i++) {
-        cout << "- " << filtered[i].jobTitle << endl;
+    cout << "\n[SUCCESS] Found " << filtered.getSize() << " jobs with keyword '" << keyword << "' in title." << endl;
+    cout << "=========================================" << endl;
+    
+    int displayCount = min(5, filtered.getSize());
+    for (int i = 0; i < displayCount; i++) {
+        cout << "\nJob Match #" << (i + 1) << ":" << endl;
+        filtered[i].display();
+    }
+    
+    if (filtered.getSize() > 5) {
+        cout << "\n... and " << (filtered.getSize() - 5) << " more jobs found." << endl;
     }
 }
 
@@ -128,111 +291,90 @@ void runSearchPerformance(ArrayDataStorage& storage) {
     cout << "Binary Search time: " << binMs << " µs | Found? " << (bf != nullptr) << endl;
 }
 
-// Expose a menu runner without defining main() to avoid multiple-entry conflicts
+// Main Function (Like Linked List)
 void runArrayMenu() {
     ArrayDataStorage storage;
-    bool loaded = false;
-
-    while (true) {
-        displayMenu();
-        int choice;
+    int choice;
+    
+    do {
+        displayArrayMainMenu(); 
+        
         if (!(cin >> choice)) {
-            cout << "Invalid input. Exiting." << endl;
-            return;
-        }
-
-        if (choice == 0) {
-            cout << "Exiting." << endl;
-            return;
+            cout << "\n[INVALID INPUT] Please enter a number from the menu." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            choice = -1;
+            continue;
         }
 
         switch (choice) {
-            case 1: {
-                cout << "Enter job CSV path [default csv/job_description.csv]: ";
-                string jobPath;
-                cin >> jobPath;
-                if (jobPath.empty()) jobPath = "csv/job_description.csv";
-
-                cout << "Enter resume CSV path [default csv/resume.csv]: ";
-                string resumePath;
-                cin >> resumePath;
-                if (resumePath.empty()) resumePath = "csv/resume.csv";
-
-                loaded = storage.loadArrayData(jobPath.c_str(), resumePath.c_str());
+            case 1:
+                cout << "\nLoading data..." << endl;
+                storage.loadArrayData("csv/job_description.csv", "csv/resume.csv");
                 break;
-            }
-            case 2: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                storage.displaySampleData(5);
+            case 2:
+                if (storage.getJobArray().getSize() == 0) {
+                    cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+                } else {
+                    cout << "\nHow many records would you like to display? (Enter number or press Enter for 20): ";
+                    
+                    string input;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    getline(cin, input);
+                    
+                    int displayCount = 20; // Default
+                    if (!input.empty()) {
+                        try {
+                            displayCount = stoi(input);
+                        } catch (...) {
+                            displayCount = 20;
+                        }
+                    }
+                    
+                    cout << "\nDisplaying " << displayCount << " records..." << endl;
+                    storage.displaySampleData(displayCount);
+                }
                 break;
-            }
-            case 3: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                runKeywordMatchingDemo(storage);
+            case 3:
+                // Call sort sub-menu
+                handleSortMenu(storage);
                 break;
-            }
-            case 4: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                storage.bubbleSortJobsByTitle();
-                cout << "Jobs sorted by title." << endl;
+            case 4:
+                handleSearchMenu(storage);
                 break;
-            }
-            case 5: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                storage.bubbleSortJobsBySkillCount();
-                cout << "Jobs sorted by skill count." << endl;
-                break;
-            }
-            case 6: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                runLinearSearchDemo(storage);
-                break;
-            }
-            case 7: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                cout << "Enter exact job title to binary search: ";
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                {
-                    string titleInput;
-                    getline(cin, titleInput);
-                    CustomString title(titleInput.c_str());
-                    Job* found = storage.binarySearchJobByTitle(title);
-                    if (found) {
-                        cout << "Found job id=" << found->id << " title=" << found->jobTitle << endl;
+            case 5:
+                if (storage.getJobArray().getSize() == 0) {
+                    cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+                } else {
+                    int resumeIndex;
+                    cout << "Enter the index of the resume to match (0 to " 
+                         << storage.getResumeArray().getSize() - 1 << "): ";
+                    
+                    if (!(cin >> resumeIndex)) {
+                         cout << "\n[INVALID INPUT] Please enter a number." << endl;
+                         cin.clear();
+                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     } else {
-                        cout << "Job not found (ensure list sorted by title)." << endl;
+                         storage.findTopMatchesForResume(storage.getResumeArray()[resumeIndex], 5);
                     }
                 }
                 break;
-            }
-            case 8: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                if (storage.getResumeArray().getSize() == 0) { cout << "No resumes loaded." << endl; break; }
-                int idx = 0;
-                cout << "Enter resume index (0-" << (storage.getResumeArray().getSize() - 1) << "): ";
-                cin >> idx;
-                if (idx < 0 || idx >= storage.getResumeArray().getSize()) { cout << "Invalid index." << endl; break; }
-                storage.findTopMatchesForResume(storage.getResumeArray()[idx], 5);
+            case 6:
+                if (storage.getJobArray().getSize() == 0) {
+                    cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+                } else {
+                    cout << "\n[Executing: Full Performance Test Suite]" << endl;
+                    runSortPerformance(storage);
+                    runSearchPerformance(storage);
+                }
                 break;
-            }
-            case 9: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                runFilterDemo(storage);
+            case 0:
+                cout << "\nExiting Job Matching System. Goodbye!" << endl;
                 break;
-            }
-            case 10: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                runSortPerformance(storage);
-                break;
-            }
-            case 11: {
-                if (!loaded) { cout << "Load data first." << endl; break; }
-                runSearchPerformance(storage);
-                break;
-            }
             default:
-                cout << "Unknown choice." << endl;
+                cout << "\n[INVALID CHOICE] Please select a valid option (0-6)." << endl;
+                break;
         }
-    }
+    } while (choice != 0);
 }
 

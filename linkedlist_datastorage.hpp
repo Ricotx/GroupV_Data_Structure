@@ -68,11 +68,16 @@ public:
     bool isDataLoaded() const { return dataLoaded; }
     
     // Display sample data to test preprocessing
-    void displaySampleData(int maxJobs = 3, int maxResumes = 3) {
+    void displaySampleData(int maxJobs = 10, int maxResumes = 10) {
         if (!dataLoaded) {
             cout << "Linked list data not loaded!" << endl;
             return;
         }
+        
+        cout << "\n=== DATA SUMMARY ===" << endl;
+        cout << "Total Jobs Loaded: " << jobList.getSize() << endl;
+        cout << "Total Resumes Loaded: " << resumeList.getSize() << endl;
+        cout << "Displaying " << min(maxJobs, jobList.getSize()) << " jobs and " << min(maxResumes, resumeList.getSize()) << " resumes..." << endl;
         
         cout << "\n=== SAMPLE LINKED LIST DATA ===" << endl;
         displaySampleJobs(jobList, maxJobs);
@@ -87,6 +92,10 @@ public:
             if (i < displayCount - 1) cout << ", ";
         }
         cout << endl;
+        
+        if (jobList.getSize() > maxJobs || resumeList.getSize() > maxResumes) {
+            cout << "\n... and " << (jobList.getSize() - maxJobs) << " more jobs, " << (resumeList.getSize() - maxResumes) << " more resumes available." << endl;
+        }
     }
     
     // Test linked list operations and data access
@@ -391,7 +400,9 @@ public:
                     }
                 }
                 int unionSize = testResume.skillCount + currentJob.skillCount - matchingSkills;
+                // Calculate match score for performance testing
                 double score = (unionSize > 0) ? static_cast<double>(matchingSkills) / unionSize : 0.0;
+                (void)score; // Suppress unused variable warning
             }
             auto end_match = chrono::high_resolution_clock::now();
             chrono::duration<double, milli> match_duration = end_match - start_match;

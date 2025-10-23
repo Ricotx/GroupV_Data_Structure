@@ -243,8 +243,27 @@ void runLinkedListMenu() {
                 dataStorage.loadLinkedListData("csv/job_description.csv", "csv/resume.csv");
                 break;
             case 2:
-                // Your display function
-                dataStorage.displaySampleData();
+                if (!dataStorage.isDataLoaded()) {
+                    cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
+                } else {
+                    cout << "\nHow many records would you like to display? (Enter number or press Enter for 20): ";
+                    
+                    string input;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    getline(cin, input);
+                    
+                    int displayCount = 20; // Default
+                    if (!input.empty()) {
+                        try {
+                            displayCount = stoi(input);
+                        } catch (...) {
+                            displayCount = 20;
+                        }
+                    }
+                    
+                    cout << "\nDisplaying " << displayCount << " records..." << endl;
+                    dataStorage.displaySampleData(displayCount, displayCount);
+                }
                 break;
             case 3:
                 // Call sort sub-menu
