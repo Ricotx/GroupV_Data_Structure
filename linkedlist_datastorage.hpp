@@ -68,16 +68,11 @@ public:
     bool isDataLoaded() const { return dataLoaded; }
     
     // Display sample data to test preprocessing
-    void displaySampleData(int maxJobs = 10, int maxResumes = 10) {
+    void displaySampleData(int maxJobs = 3, int maxResumes = 3) {
         if (!dataLoaded) {
             cout << "Linked list data not loaded!" << endl;
             return;
         }
-        
-        cout << "\n=== DATA SUMMARY ===" << endl;
-        cout << "Total Jobs Loaded: " << jobList.getSize() << endl;
-        cout << "Total Resumes Loaded: " << resumeList.getSize() << endl;
-        cout << "Displaying " << min(maxJobs, jobList.getSize()) << " jobs and " << min(maxResumes, resumeList.getSize()) << " resumes..." << endl;
         
         cout << "\n=== SAMPLE LINKED LIST DATA ===" << endl;
         displaySampleJobs(jobList, maxJobs);
@@ -92,10 +87,6 @@ public:
             if (i < displayCount - 1) cout << ", ";
         }
         cout << endl;
-        
-        if (jobList.getSize() > maxJobs || resumeList.getSize() > maxResumes) {
-            cout << "\n... and " << (jobList.getSize() - maxJobs) << " more jobs, " << (resumeList.getSize() - maxResumes) << " more resumes available." << endl;
-        }
     }
     
     // Test linked list operations and data access
@@ -319,7 +310,6 @@ public:
         displaySampleResumes(resumeList, maxResumes);
     }
 
-
     void runPerformanceTests() {
         if (!dataLoaded) {
             cout << "Please load data first." << endl;
@@ -330,6 +320,7 @@ public:
         // Test 1: Sort Jobs by Title
         CustomLinkedList<Job> jobsToSortTitle = originalJobList;
         auto start1 = chrono::high_resolution_clock::now();
+        // --- Bubble Sort Logic for Test 1 ---
         bool swapped1;
         do { 
             swapped1 = false; 
@@ -339,16 +330,19 @@ public:
                     jobsToSortTitle.swapNodes(current, current->next); 
                     swapped1 = true; 
                 } 
-                current = current->next; 
+                // Advance current *after* potential swap or check
+                if (current) current = current->next; // Need to re-check current in case it became tail after swap
             } 
         } while (swapped1);
+        // --- End Sort Logic ---
         auto end1 = chrono::high_resolution_clock::now();
-        chrono::duration<double, milli> duration1 = end1 - start1;
+        auto duration1 = chrono::duration_cast<chrono::milliseconds>(end1 - start1);
         cout << "Time taken for Bubble Sort (Jobs by Title): " << duration1.count() << " ms" << endl;
 
         // Test 2: Sort Jobs by Skill Count
         CustomLinkedList<Job> jobsToSortSkill = originalJobList;
         auto start2 = chrono::high_resolution_clock::now();
+        // --- Bubble Sort Logic for Test 2 ---
         bool swapped2;
         do { 
             swapped2 = false; 
@@ -358,16 +352,18 @@ public:
                     jobsToSortSkill.swapNodes(current, current->next); 
                     swapped2 = true; 
                 } 
-                current = current->next; 
+                if (current) current = current->next; 
             } 
         } while (swapped2);
+        // --- End Sort Logic ---
         auto end2 = chrono::high_resolution_clock::now();
-        chrono::duration<double, milli> duration2 = end2 - start2;
+        auto duration2 = chrono::duration_cast<chrono::milliseconds>(end2 - start2);
         cout << "Time taken for Bubble Sort (Jobs by Skill Count): " << duration2.count() << " ms" << endl;
 
         // Test 3: Sort Resumes by Skill Count
         CustomLinkedList<Resume> resumesToSort = originalResumeList;
         auto start3 = chrono::high_resolution_clock::now();
+        // --- Bubble Sort Logic for Test 3 ---
         bool swapped3;
         do { 
             swapped3 = false; 
@@ -377,20 +373,24 @@ public:
                     resumesToSort.swapNodes(current, current->next); 
                     swapped3 = true; 
                 } 
-                current = current->next; 
+                if (current) current = current->next; 
             } 
         } while (swapped3);
+        // --- End Sort Logic ---
         auto end3 = chrono::high_resolution_clock::now();
-        chrono::duration<double, milli> duration3 = end3 - start3;
+        auto duration3 = chrono::duration_cast<chrono::milliseconds>(end3 - start3);
         cout << "Time taken for Bubble Sort (Resumes by Skill Count): " << duration3.count() << " ms" << endl;
 
         // Test 4: Job Matching Speed
         if (!originalResumeList.empty()) {
-            Resume& testResume = originalResumeList[0];
+            Resume& testResume = originalResumeList[0]; // Use the first resume for the test
             auto start_match = chrono::high_resolution_clock::now();
+
+            // --- Job Matching Logic ---
             for (int i = 0; i < jobList.getSize(); ++i) {
-                Job& currentJob = jobList[i];
+                Job& currentJob = jobList[i]; // Use operator[] on the main jobList
                 int matchingSkills = 0;
+                // Compare skills (using lowercase versions as intended)
                 for (int j = 0; j < testResume.lowerCaseSkills.size(); ++j) {
                     for (int k = 0; k < currentJob.lowerCaseSkills.size(); ++k) {
                         if (strcmp(testResume.lowerCaseSkills[j].c_str(), currentJob.lowerCaseSkills[k].c_str()) == 0) { 
@@ -400,31 +400,39 @@ public:
                     }
                 }
                 int unionSize = testResume.skillCount + currentJob.skillCount - matchingSkills;
-                // Calculate match score for performance testing
+                // Calculate match score (optional, can be commented out if not needed for timing)
                 double score = (unionSize > 0) ? static_cast<double>(matchingSkills) / unionSize : 0.0;
-                (void)score; // Suppress unused variable warning
+                 (void)score; // Suppress unused variable warning if you only care about timing the loops
             }
+            // --- End Matching Logic ---
+
             auto end_match = chrono::high_resolution_clock::now();
-            chrono::duration<double, milli> match_duration = end_match - start_match;
+            auto match_duration = chrono::duration_cast<chrono::milliseconds>(end_match - start_match);
             cout << "Time taken for matching one resume to all jobs: " << match_duration.count() << " ms" << endl;
         }
 
-        //Test 5：Test Search Job Title
+        // Test 5: Linear Search (Worst-Case)
         if (!originalJobList.empty()) {
-            // Get the title of the VERY LAST 佛 test the worst-case scenario
+            // Get the title of the VERY LAST job from the original list
             CustomString worstCaseTitle = originalJobList[originalJobList.getSize() - 1].jobTitle;
     
             cout << "Searching for last job title: \"" << worstCaseTitle << "\"..." << endl;
             
             auto start_search = chrono::high_resolution_clock::now();
             
-            CustomLinkedList<Job> searchResult = linearSearchJobsByTitle(worstCaseTitle);
+            // Perform the search on the main jobList (or originalJobList if you prefer)
+            CustomLinkedList<Job> searchResult = linearSearchJobsByTitle(worstCaseTitle); 
             
             auto end_search = chrono::high_resolution_clock::now();
-            chrono::duration<double, milli> search_duration = end_search - start_search;
+            // Calculate duration in milliseconds as integer
+            auto search_duration = chrono::duration_cast<chrono::milliseconds>(end_search - start_search);
             
             cout << "Time taken for Linear Search (Jobs by Title, worst-case): " 
                  << search_duration.count() << " ms" << endl;
         }
-    }
+    } 
+
 };
+
+
+    
