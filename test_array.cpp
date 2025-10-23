@@ -236,16 +236,16 @@ void runJobSkillSearchDemo(ArrayDataStorage& storage) {
     cout << "Found " << results.getSize() << " jobs with this skill." << endl;
     
     if (results.getSize() > 0) {
-        cout << "\n=== Job Results ===" << endl;
-        for (int i = 0; i < min(10, results.getSize()); i++) {
-            cout << "\nJob " << (i + 1) << ":" << endl;
+        cout << "\n[SUCCESS] Found " << results.getSize() << " job(s) with skill \"" << skill << "\":" << endl;
+        cout << "=========================================" << endl;
+        for (int i = 0; i < results.getSize(); i++) {
             results[i].display();
-        }
-        if (results.getSize() > 10) {
-            cout << "\n... and " << (results.getSize() - 10) << " more jobs found." << endl;
+            if (i < results.getSize() - 1) {
+                cout << "---" << endl;
+            }
         }
     } else {
-        cout << "No jobs found with the skill \"" << skill << "\"." << endl;
+        cout << "[NOT FOUND] No jobs found with the skill \"" << skill << "\"." << endl;
     }
 }
 
@@ -267,16 +267,16 @@ void runResumeSkillSearchDemo(ArrayDataStorage& storage) {
     cout << "Found " << results.getSize() << " resumes with this skill." << endl;
     
     if (results.getSize() > 0) {
-        cout << "\n=== Resume Results ===" << endl;
-        for (int i = 0; i < min(10, results.getSize()); i++) {
-            cout << "\nResume " << (i + 1) << ":" << endl;
+        cout << "\n[SUCCESS] Found " << results.getSize() << " resume(s) with skill \"" << skill << "\":" << endl;
+        cout << "=========================================" << endl;
+        for (int i = 0; i < results.getSize(); i++) {
             results[i].display();
-        }
-        if (results.getSize() > 10) {
-            cout << "\n... and " << (results.getSize() - 10) << " more resumes found." << endl;
+            if (i < results.getSize() - 1) {
+                cout << "---" << endl;
+            }
         }
     } else {
-        cout << "No resumes found with the skill \"" << skill << "\"." << endl;
+        cout << "[NOT FOUND] No resumes found with the skill \"" << skill << "\"." << endl;
     }
 }
 
