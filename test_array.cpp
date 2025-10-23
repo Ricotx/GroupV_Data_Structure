@@ -142,8 +142,14 @@ void handleSortMenu(ArrayDataStorage& storage) {
                 storage.displaySampleData(5);
                 break;
             case 3:
-                // Note: Array implementation doesn't have resume sorting yet
-                cout << "Resume sorting not implemented in Array version." << endl;
+                storage.bubbleSortResumesBySkillCount();
+                cout << "Resumes sorted by skill count." << endl;
+                // Display sample resumes after sorting
+                cout << "\n=== Sample Resumes After Sorting ===" << endl;
+                for (int i = 0; i < min(5, storage.getResumeArray().getSize()); i++) {
+                    cout << "Resume " << i + 1 << ": ID=" << storage.getResumeArray()[i].id 
+                         << ", Skills=" << storage.getResumeArray()[i].skillCount << endl;
+                }
                 break;
             case 0:
                 cout << "Returning to main menu..." << endl;
@@ -175,6 +181,68 @@ void runLinearSearchDemo(ArrayDataStorage& storage) {
         found->display();
     } else {
         cout << "[NOT FOUND] No job with the title \"" << title << "\" was found." << endl;
+    }
+}
+
+// Demo: Search jobs by skill
+void runJobSkillSearchDemo(ArrayDataStorage& storage) {
+    if (storage.getJobArray().getSize() == 0) {
+        cout << "No jobs available for skill search" << endl;
+        return;
+    }
+
+    cout << "Enter skill to search for: ";
+    string skillInput;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, skillInput);
+    CustomString skill(skillInput.c_str());
+
+    CustomArrayV2<Job> results = storage.searchJobsBySkill(skill);
+    cout << "\nSearch results for skill: '" << skill << "'" << endl;
+    cout << "Found " << results.getSize() << " jobs with this skill." << endl;
+    
+    if (results.getSize() > 0) {
+        cout << "\n=== Job Results ===" << endl;
+        for (int i = 0; i < min(10, results.getSize()); i++) {
+            cout << "\nJob " << (i + 1) << ":" << endl;
+            results[i].display();
+        }
+        if (results.getSize() > 10) {
+            cout << "\n... and " << (results.getSize() - 10) << " more jobs found." << endl;
+        }
+    } else {
+        cout << "No jobs found with the skill \"" << skill << "\"." << endl;
+    }
+}
+
+// Demo: Search resumes by skill
+void runResumeSkillSearchDemo(ArrayDataStorage& storage) {
+    if (storage.getResumeArray().getSize() == 0) {
+        cout << "No resumes available for skill search" << endl;
+        return;
+    }
+
+    cout << "Enter skill to search for: ";
+    string skillInput;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, skillInput);
+    CustomString skill(skillInput.c_str());
+
+    CustomArrayV2<Resume> results = storage.searchResumesBySkill(skill);
+    cout << "\nSearch results for skill: '" << skill << "'" << endl;
+    cout << "Found " << results.getSize() << " resumes with this skill." << endl;
+    
+    if (results.getSize() > 0) {
+        cout << "\n=== Resume Results ===" << endl;
+        for (int i = 0; i < min(10, results.getSize()); i++) {
+            cout << "\nResume " << (i + 1) << ":" << endl;
+            results[i].display();
+        }
+        if (results.getSize() > 10) {
+            cout << "\n... and " << (results.getSize() - 10) << " more resumes found." << endl;
+        }
+    } else {
+        cout << "No resumes found with the skill \"" << skill << "\"." << endl;
     }
 }
 
@@ -213,10 +281,10 @@ void handleSearchMenu(ArrayDataStorage& storage) {
                 runLinearSearchDemo(storage);
                 break;
             case 2:
-                cout << "Job skill search not implemented in Array version." << endl;
+                runJobSkillSearchDemo(storage);
                 break;
             case 3:
-                cout << "Resume skill search not implemented in Array version." << endl;
+                runResumeSkillSearchDemo(storage);
                 break;
             case 0:
                 cout << "Returning to main menu..." << endl;

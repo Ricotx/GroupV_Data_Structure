@@ -131,6 +131,27 @@ public:
         cout << "Sorting complete!" << endl;
     }
 
+    void bubbleSortResumesBySkillCount() {
+        int n = resumeArray.getSize();
+        cout << "Sorting " << n << " resumes by skill count... This may take a moment." << endl;
+        
+        for (int i = 0; i < n - 1; i++) {
+            // Show progress every 1000 iterations
+            if (i % 1000 == 0) {
+                cout << "Progress: " << (i * 100) / (n - 1) << "%" << endl;
+            }
+            
+            for (int j = 0; j < n - i - 1; j++) {
+                if (resumeArray[j].skillCount > resumeArray[j + 1].skillCount) {
+                    Resume temp = resumeArray[j];
+                    resumeArray[j] = resumeArray[j + 1];
+                    resumeArray[j + 1] = temp;
+                }
+            }
+        }
+        cout << "Sorting complete!" << endl;
+    }
+
    
     Job* linearSearchJobByTitle(const CustomString& title) {
         for (int i = 0; i < jobArray.getSize(); i++) {
@@ -197,6 +218,42 @@ public:
             if (resumeArray[i].id == targetId) return &resumeArray[i];
         }
         return nullptr;
+    }
+
+    // Search jobs by skill
+    CustomArrayV2<Job> searchJobsBySkill(const CustomString& skill) {
+        CustomArrayV2<Job> results;
+        CustomString lowerSkill = convertToLowerCase(skill);
+        
+        for (int i = 0; i < jobArray.getSize(); i++) {
+            const Job& job = jobArray[i];
+            for (int j = 0; j < job.skills.size(); j++) {
+                CustomString jobSkill = convertToLowerCase(job.skills[j]);
+                if (strcmp(jobSkill.c_str(), lowerSkill.c_str()) == 0) {
+                    results.push_back(job);
+                    break; // Found the skill, no need to check other skills for this job
+                }
+            }
+        }
+        return results;
+    }
+
+    // Search resumes by skill
+    CustomArrayV2<Resume> searchResumesBySkill(const CustomString& skill) {
+        CustomArrayV2<Resume> results;
+        CustomString lowerSkill = convertToLowerCase(skill);
+        
+        for (int i = 0; i < resumeArray.getSize(); i++) {
+            const Resume& resume = resumeArray[i];
+            for (int j = 0; j < resume.resumeSkills.size(); j++) {
+                CustomString resumeSkill = convertToLowerCase(resume.resumeSkills[j]);
+                if (strcmp(resumeSkill.c_str(), lowerSkill.c_str()) == 0) {
+                    results.push_back(resume);
+                    break; // Found the skill, no need to check other skills for this resume
+                }
+            }
+        }
+        return results;
     }
 
     // Filter jobs whose title contains a keyword (case-insensitive using stored lowerCaseTitle)
