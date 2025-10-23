@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <ctime>
 #include <cstring>
+#include <chrono>
 
 using namespace std;
 
@@ -94,6 +95,8 @@ public:
         int n = jobArray.getSize();
         cout << "Sorting " << n << " jobs by title... This may take a moment." << endl;
         
+        auto start = chrono::high_resolution_clock::now();
+        
         for (int i = 0; i < n - 1; i++) {
             // Show progress every 1000 iterations
             if (i % 1000 == 0) {
@@ -108,12 +111,18 @@ public:
                 }
             }
         }
-        cout << "Sorting complete!" << endl;
+        
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        
+        cout << "Sorting complete! Time taken: " << duration.count() << " ms" << endl;
     }
 
     void bubbleSortJobsBySkillCount() {
         int n = jobArray.getSize();
         cout << "Sorting " << n << " jobs by skill count... This may take a moment." << endl;
+        
+        auto start = chrono::high_resolution_clock::now();
         
         for (int i = 0; i < n - 1; i++) {
             // Show progress every 1000 iterations
@@ -129,12 +138,18 @@ public:
                 }
             }
         }
-        cout << "Sorting complete!" << endl;
+        
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        
+        cout << "Sorting complete! Time taken: " << duration.count() << " ms" << endl;
     }
 
     void bubbleSortResumesBySkillCount() {
         int n = resumeArray.getSize();
         cout << "Sorting " << n << " resumes by skill count... This may take a moment." << endl;
+        
+        auto start = chrono::high_resolution_clock::now();
         
         for (int i = 0; i < n - 1; i++) {
             // Show progress every 1000 iterations
@@ -150,7 +165,11 @@ public:
                 }
             }
         }
-        cout << "Sorting complete!" << endl;
+        
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        
+        cout << "Sorting complete! Time taken: " << duration.count() << " ms" << endl;
     }
 
     // QuickSort implementation for jobs by skill count
