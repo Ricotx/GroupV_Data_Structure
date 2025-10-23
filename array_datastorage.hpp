@@ -445,16 +445,8 @@ public:
             matches.push_back(job);
         }
 
-        // Sort by match score (bubble sort)
-        for (int i = 0; i < matches.getSize() - 1; i++) {
-            for (int j = 0; j < matches.getSize() - i - 1; j++) {
-                if (matches[j].matchScore < matches[j + 1].matchScore) {
-                    Job temp = matches[j];
-                    matches[j] = matches[j + 1];
-                    matches[j + 1] = temp;
-                }
-            }
-        }
+        // Sort by match score (QuickSort for better performance)
+        quickSortJobsByMatchScore(matches, 0, matches.getSize() - 1);
         
         auto end = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
@@ -492,6 +484,32 @@ public:
     // === Getters ===
     CustomArrayV2<Job>& getJobArray() { return jobArray; }
     CustomArrayV2<Resume>& getResumeArray() { return resumeArray; }
+
+    // QuickSort for job matching (by match score)
+    void quickSortJobsByMatchScore(CustomArrayV2<Job>& jobs, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partitionJobsByMatchScore(jobs, low, high);
+            quickSortJobsByMatchScore(jobs, low, pivotIndex - 1);
+            quickSortJobsByMatchScore(jobs, pivotIndex + 1, high);
+        }
+    }
+    
+    int partitionJobsByMatchScore(CustomArrayV2<Job>& jobs, int low, int high) {
+        double pivot = jobs[high].matchScore;
+        int i = low - 1;
+        for (int j = low; j < high; j++) {
+            if (jobs[j].matchScore >= pivot) { // Descending order
+                i++;
+                Job temp = jobs[i];
+                jobs[i] = jobs[j];
+                jobs[j] = temp;
+            }
+        }
+        Job temp = jobs[i + 1];
+        jobs[i + 1] = jobs[high];
+        jobs[high] = temp;
+        return i + 1;
+    }
 
 private:
     double calculateWeightedMatchScore(const Job& job, const Resume& resume) {
