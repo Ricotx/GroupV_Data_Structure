@@ -7,7 +7,6 @@
 using namespace std;
 
 // Forward declarations
-void runSortPerformance(ArrayDataStorage& storage);
 void runSearchPerformance(ArrayDataStorage& storage);
 
 void displayArrayMainMenu() {
@@ -114,7 +113,6 @@ void displayArraySortMenu() {
     cout << "3. Sort Jobs by Skill Count - Quick Sort" << endl;
     cout << "4. Sort Jobs by Skill Count - Merge Sort" << endl;
     cout << "5. Sort Resumes by Skill Count - Bubble Sort" << endl;
-    cout << "6. Performance Comparison (All Sorting Algorithms)" << endl;
     cout << "0. Back to Main Menu" << endl;
     cout << "----------------------" << endl;
     cout << "Enter your choice: ";
@@ -168,9 +166,6 @@ void handleSortMenu(ArrayDataStorage& storage) {
                     cout << "Resume " << i + 1 << ": ID=" << storage.getResumeArray()[i].id 
                          << ", Skills=" << storage.getResumeArray()[i].skillCount << endl;
                 }
-                break;
-            case 6:
-                runSortPerformance(storage);
                 break;
             case 0:
                 cout << "Returning to main menu..." << endl;
@@ -356,77 +351,6 @@ void runFilterDemo(ArrayDataStorage& storage) {
 }
 
 // Performance: sort by title timing
-void runSortPerformance(ArrayDataStorage& storage) {
-    if (storage.getJobArray().getSize() == 0) {
-        cout << "No data loaded for performance test." << endl;
-        return;
-    }
-
-    cout << "\n=== SORTING ALGORITHM PERFORMANCE COMPARISON ===" << endl;
-    cout << "Dataset size: " << storage.getJobArray().getSize() << " jobs" << endl;
-    
-    // Create copies for fair comparison
-    ArrayDataStorage bubbleCopy, quickCopy, mergeCopy;
-    bubbleCopy.loadArrayData("csv/job_description.csv", "csv/resume.csv");
-    quickCopy.loadArrayData("csv/job_description.csv", "csv/resume.csv");
-    mergeCopy.loadArrayData("csv/job_description.csv", "csv/resume.csv");
-    
-    cout << "\nTesting all three sorting algorithms..." << endl;
-    
-    // Test Bubble Sort
-    cout << "\n1. BUBBLE SORT:" << endl;
-    auto start = chrono::high_resolution_clock::now();
-    bubbleCopy.bubbleSortJobsBySkillCount();
-    auto end = chrono::high_resolution_clock::now();
-    auto bubbleTime = chrono::duration_cast<chrono::milliseconds>(end - start);
-    cout << "Bubble Sort Time: " << bubbleTime.count() << " ms" << endl;
-    
-    // Test Quick Sort
-    cout << "\n2. QUICK SORT:" << endl;
-    start = chrono::high_resolution_clock::now();
-    quickCopy.quickSortJobsBySkillCount();
-    end = chrono::high_resolution_clock::now();
-    auto quickTime = chrono::duration_cast<chrono::milliseconds>(end - start);
-    cout << "Quick Sort Time: " << quickTime.count() << " ms" << endl;
-    
-    // Test Merge Sort
-    cout << "\n3. MERGE SORT:" << endl;
-    start = chrono::high_resolution_clock::now();
-    mergeCopy.mergeSortJobsBySkillCount();
-    end = chrono::high_resolution_clock::now();
-    auto mergeTime = chrono::duration_cast<chrono::milliseconds>(end - start);
-    cout << "Merge Sort Time: " << mergeTime.count() << " ms" << endl;
-    
-    // Performance Summary
-    cout << "\n=== PERFORMANCE SUMMARY ===" << endl;
-    cout << "Bubble Sort: " << bubbleTime.count() << " ms (O(n²))" << endl;
-    cout << "Quick Sort:  " << quickTime.count() << " ms (O(n log n) average)" << endl;
-    cout << "Merge Sort:  " << mergeTime.count() << " ms (O(n log n))" << endl;
-    
-    // Calculate speedup
-    if (bubbleTime.count() > 0) {
-        double quickSpeedup = (double)bubbleTime.count() / quickTime.count();
-        double mergeSpeedup = (double)bubbleTime.count() / mergeTime.count();
-        cout << "\nSpeedup vs Bubble Sort:" << endl;
-        cout << "Quick Sort: " << fixed << setprecision(2) << quickSpeedup << "x faster" << endl;
-        cout << "Merge Sort: " << fixed << setprecision(2) << mergeSpeedup << "x faster" << endl;
-    }
-    
-    // Verify all sorts produce same result
-    bool resultsMatch = true;
-    for (int i = 0; i < bubbleCopy.getJobArray().getSize(); i++) {
-        if (bubbleCopy.getJobArray()[i].skillCount != quickCopy.getJobArray()[i].skillCount ||
-            bubbleCopy.getJobArray()[i].skillCount != mergeCopy.getJobArray()[i].skillCount) {
-            resultsMatch = false;
-            break;
-        }
-    }
-    cout << "\nSorting Verification: " << (resultsMatch ? "ALL ALGORITHMS PRODUCE IDENTICAL RESULTS" : "ERROR - Results don't match") << endl;
-    
-    // Memory usage comparison
-    cout << "\n=== MEMORY USAGE COMPARISON ===" << endl;
-    bubbleCopy.printMemoryStats();
-}
 
 // Performance: linear vs binary search timing
 void runSearchPerformance(ArrayDataStorage& storage) {
@@ -528,8 +452,7 @@ void runArrayMenu() {
                        if (storage.getJobArray().getSize() == 0) {
                            cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
                        } else {
-                           cout << "\n[Executing: Full Performance Test Suite]" << endl;
-                           runSortPerformance(storage);
+                           cout << "\n[Executing: Search Performance Test]" << endl;
                            runSearchPerformance(storage);
                        }
                        break;
