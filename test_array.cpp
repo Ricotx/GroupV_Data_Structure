@@ -18,7 +18,6 @@ void displayArrayMainMenu() {
     cout << "4. Search Data (Linear Search)" << endl;
     cout << "5. Find Job Matches for Resume" << endl;
     cout << "6. Performance Tests" << endl;
-    cout << "7. Memory Usage Statistics" << endl;
     cout << "0. Exit" << endl;
     cout << "=================================" << endl;
     cout << "Enter your choice: ";
@@ -484,18 +483,11 @@ void runArrayMenu() {
                            runSearchPerformance(storage);
                        }
                        break;
-                   case 7:
-                       if (storage.getJobArray().getSize() == 0) {
-                           cout << "\n[ERROR] Please load data first (Main Menu option 1)." << endl;
-                       } else {
-                           storage.printMemoryStats();
-                       }
-                       break;
                    case 0:
                        cout << "\nExiting Job Matching System. Goodbye!" << endl;
                        break;
                    default:
-                       cout << "\n[INVALID CHOICE] Please select a valid option (0-7)." << endl;
+                       cout << "\n[INVALID CHOICE] Please select a valid option (0-6)." << endl;
                        break;
         }
     } while (choice != 0);
