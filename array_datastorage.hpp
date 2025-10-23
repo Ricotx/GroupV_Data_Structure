@@ -433,6 +433,11 @@ public:
     }
 
     void findTopMatchesForResume(const Resume& resume, int topN = 5) {
+        cout << "\n=== Finding Job Matches for Resume " << resume.id << " ===" << endl;
+        cout << "Processing " << jobArray.getSize() << " jobs..." << endl;
+        
+        auto start = chrono::high_resolution_clock::now();
+        
         CustomArrayV2<Job> matches;
         for (int i = 0; i < jobArray.getSize(); i++) {
             Job job = jobArray[i];
@@ -450,6 +455,9 @@ public:
                 }
             }
         }
+        
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
 
         cout << "\n=== Top " << topN << " Job Matches for Resume " << resume.id << " ===" << endl;
         cout << "Resume Skills: ";
@@ -477,6 +485,8 @@ public:
             cout << "---" << endl;
             displayed++;
         }
+        
+        cout << "\nJob matching completed in: " << duration.count() << " ms" << endl;
     }
 
     // === Getters ===
