@@ -334,19 +334,6 @@ public:
     }
 
    
-    double calculateWeightedMatchScore(const Job& job, const Resume& resume) {
-        int matchCount = 0;
-        for (int i = 0; i < job.skills.size(); i++) {
-            for (int j = 0; j < resume.resumeSkills.size(); j++) {
-                if (strcmp(job.skills[i].c_str(), resume.resumeSkills[j].c_str()) == 0)
-                    matchCount++;
-            }
-        }
-        if (job.skills.size() == 0)
-            return 0.0;
-        return (double)matchCount / job.skills.size();
-    }
-
     // Simple keyword-based score based on full descriptions
     int calculateKeywordOverlapScore(const Job& job, const Resume& resume) {
         return calculateMatchScore(job.fullDescription, resume.fullDescription);
@@ -467,7 +454,7 @@ public:
             cout << endl;
             cout << "Category: " << matches[i].jobCategory << endl;
             cout << "Priority: " << matches[i].priority << endl;
-            cout << "Match Score: " << fixed << setprecision(3) << matches[i].matchScore << endl;
+            cout << "Match Score: " << fixed << setprecision(6) << matches[i].matchScore << endl;
             cout << "---" << endl;
             displayed++;
         }
@@ -476,4 +463,54 @@ public:
     // === Getters ===
     CustomArrayV2<Job>& getJobArray() { return jobArray; }
     CustomArrayV2<Resume>& getResumeArray() { return resumeArray; }
+
+private:
+    double calculateWeightedMatchScore(const Job& job, const Resume& resume) {
+        int matchCount = 0;
+        int resumeSkillsUsed = 0;
+        
+        // Count matching skills
+        for (int i = 0; i < job.skills.size(); i++) {
+            for (int j = 0; j < resume.resumeSkills.size(); j++) {
+                if (strcmp(job.skills[i].c_str(), resume.resumeSkills[j].c_str()) == 0) {
+                    matchCount++;
+                    break; // Found match, move to next job skill
+                }
+            }
+        }
+        
+        // Count how many resume skills are utilized
+        for (int j = 0; j < resume.resumeSkills.size(); j++) {
+            for (int i = 0; i < job.skills.size(); i++) {
+                if (strcmp(resume.resumeSkills[j].c_str(), job.skills[i].c_str()) == 0) {
+                    resumeSkillsUsed++;
+                    break; // Found match, move to next resume skill
+                }
+            }
+        }
+        
+        if (job.skills.size() == 0 || resume.resumeSkills.size() == 0)
+            return 0.0;
+        
+        // Calculate base score (job skill coverage)
+        double jobCoverage = (double)matchCount / job.skills.size();
+        
+        // Calculate resume utilization bonus
+        double resumeUtilization = (double)resumeSkillsUsed / resume.resumeSkills.size();
+        
+        // Calculate total matching skills bonus (more matches = higher score)
+        double matchBonus = (double)matchCount / max(job.skills.size(), resume.resumeSkills.size());
+        
+        // Calculate skill density bonus (jobs with more skills get slight bonus)
+        double skillDensityBonus = (double)job.skills.size() / 10.0; // Normalize to 0-1 range
+        
+        // Weighted combination: 40% job coverage + 25% resume utilization + 20% match bonus + 15% skill density
+        double finalScore = (0.4 * jobCoverage) + (0.25 * resumeUtilization) + (0.2 * matchBonus) + (0.15 * skillDensityBonus);
+        
+        // Add tiny tie-breaker based on job ID to ensure different scores
+        double tieBreaker = (double)job.id / 100000.0; // Very small adjustment
+        finalScore += tieBreaker;
+        
+        return finalScore;
+    }
 };
