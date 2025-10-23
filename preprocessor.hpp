@@ -374,8 +374,8 @@ Resume preprocessResumeDescription(const CustomString& rawLine, int id,
     // Step 2: Extract raw skills
     CustomArray<CustomString> rawSkills = extractResumeSkills(lowerLine);
     
+    resume.skillCount = rawSkills.size();
     // Step 3: Filter against valid skillset
-    resume.skillCount = resume.resumeSkills.size();
     resume.resumeSkills = filterResumeSkills(rawSkills, validSkills);
     
     
