@@ -26,8 +26,8 @@ public:
 
         for (int i = 0; i < jobArray.getSize(); i++) {
             const Job& job = jobArray[i];
-            for (int j = 0; j < job.skills.size(); j++) {
-                CustomString skill = job.skills[j];
+            for (int j = 0; j < job.lowerCaseSkills.size(); j++) {
+                CustomString skill = job.lowerCaseSkills[j];
                 bool exists = false;
                 for (int k = 0; k < skillset.size(); k++) {
                     if (strcmp(skillset[k].c_str(), skill.c_str()) == 0) {
