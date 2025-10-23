@@ -37,10 +37,16 @@ int main() {
             case 1:
                 cout << "\n=== Launching Linked List Team Menu ===" << endl;
                 runLinkedListMenu();
+                // Clear input stream after sub-menu returns
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 break;
             case 2:
                 cout << "\n=== Launching Array Team Menu ===" << endl;
                 runArrayMenu();
+                // Clear input stream after sub-menu returns
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 break;
             case 0:
                 cout << "Exiting program." << endl;
