@@ -191,6 +191,8 @@ void runLinearSearchDemo(ArrayDataStorage& storage) {
 
     cout << "\nLinear search for title: '" << title << "'\n";
     
+    auto start = chrono::high_resolution_clock::now();
+    
     // Find ALL jobs with matching title
     CustomArrayV2<Job> foundJobs;
     for (int i = 0; i < storage.getJobArray().getSize(); i++) {
@@ -198,6 +200,9 @@ void runLinearSearchDemo(ArrayDataStorage& storage) {
             foundJobs.push_back(storage.getJobArray()[i]);
         }
     }
+    
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
     
     if (foundJobs.getSize() > 0) {
         cout << "\n[SUCCESS] Found " << foundJobs.getSize() << " job(s) matching \"" << title << "\":" << endl;
@@ -208,8 +213,10 @@ void runLinearSearchDemo(ArrayDataStorage& storage) {
                 cout << "---" << endl;
             }
         }
+        cout << "\nSearch completed in: " << duration.count() << " ms" << endl;
     } else {
         cout << "[NOT FOUND] No job with the title \"" << title << "\" was found." << endl;
+        cout << "Search completed in: " << duration.count() << " ms" << endl;
     }
 }
 
@@ -226,8 +233,13 @@ void runJobSkillSearchDemo(ArrayDataStorage& storage) {
     getline(cin, skillInput);
     CustomString skill(skillInput.c_str());
 
-    CustomArrayV2<Job> results = storage.searchJobsBySkill(skill);
     cout << "\nSearch results for skill: '" << skill << "'" << endl;
+    
+    auto start = chrono::high_resolution_clock::now();
+    CustomArrayV2<Job> results = storage.searchJobsBySkill(skill);
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+    
     cout << "Found " << results.getSize() << " jobs with this skill." << endl;
     
     if (results.getSize() > 0) {
@@ -239,8 +251,10 @@ void runJobSkillSearchDemo(ArrayDataStorage& storage) {
                 cout << "---" << endl;
             }
         }
+        cout << "\nSearch completed in: " << duration.count() << " ms" << endl;
     } else {
         cout << "[NOT FOUND] No jobs found with the skill \"" << skill << "\"." << endl;
+        cout << "Search completed in: " << duration.count() << " ms" << endl;
     }
 }
 
@@ -257,8 +271,13 @@ void runResumeSkillSearchDemo(ArrayDataStorage& storage) {
     getline(cin, skillInput);
     CustomString skill(skillInput.c_str());
 
-    CustomArrayV2<Resume> results = storage.searchResumesBySkill(skill);
     cout << "\nSearch results for skill: '" << skill << "'" << endl;
+    
+    auto start = chrono::high_resolution_clock::now();
+    CustomArrayV2<Resume> results = storage.searchResumesBySkill(skill);
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+    
     cout << "Found " << results.getSize() << " resumes with this skill." << endl;
     
     if (results.getSize() > 0) {
@@ -270,8 +289,10 @@ void runResumeSkillSearchDemo(ArrayDataStorage& storage) {
                 cout << "---" << endl;
             }
         }
+        cout << "\nSearch completed in: " << duration.count() << " ms" << endl;
     } else {
         cout << "[NOT FOUND] No resumes found with the skill \"" << skill << "\"." << endl;
+        cout << "Search completed in: " << duration.count() << " ms" << endl;
     }
 }
 
