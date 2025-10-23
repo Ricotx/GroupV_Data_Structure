@@ -214,9 +214,11 @@ void runLinearSearchDemo(ArrayDataStorage& storage) {
             }
         }
         cout << "\nSearch completed in: " << duration.count() << " ms" << endl;
+        cout << "Total matches found: " << foundJobs.getSize() << " jobs" << endl;
     } else {
         cout << "[NOT FOUND] No job with the title \"" << title << "\" was found." << endl;
         cout << "Search completed in: " << duration.count() << " ms" << endl;
+        cout << "Total matches found: 0 jobs" << endl;
     }
 }
 
@@ -252,9 +254,11 @@ void runJobSkillSearchDemo(ArrayDataStorage& storage) {
             }
         }
         cout << "\nSearch completed in: " << duration.count() << " ms" << endl;
+        cout << "Total matches found: " << results.getSize() << " jobs" << endl;
     } else {
         cout << "[NOT FOUND] No jobs found with the skill \"" << skill << "\"." << endl;
         cout << "Search completed in: " << duration.count() << " ms" << endl;
+        cout << "Total matches found: 0 jobs" << endl;
     }
 }
 
@@ -290,9 +294,11 @@ void runResumeSkillSearchDemo(ArrayDataStorage& storage) {
             }
         }
         cout << "\nSearch completed in: " << duration.count() << " ms" << endl;
+        cout << "Total matches found: " << results.getSize() << " resumes" << endl;
     } else {
         cout << "[NOT FOUND] No resumes found with the skill \"" << skill << "\"." << endl;
         cout << "Search completed in: " << duration.count() << " ms" << endl;
+        cout << "Total matches found: 0 resumes" << endl;
     }
 }
 
