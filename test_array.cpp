@@ -194,12 +194,25 @@ void runLinearSearchDemo(ArrayDataStorage& storage) {
     getline(cin, titleInput);
     CustomString title(titleInput.c_str());
 
-    Job* found = storage.linearSearchJobByTitle(title);
     cout << "\nLinear search for title: '" << title << "'\n";
-    if (found) {
-        cout << "\n[SUCCESS] Found job matching \"" << title << "\":" << endl;
+    
+    // Find ALL jobs with matching title
+    CustomArrayV2<Job> foundJobs;
+    for (int i = 0; i < storage.getJobArray().getSize(); i++) {
+        if (strcmp(storage.getJobArray()[i].jobTitle.c_str(), title.c_str()) == 0) {
+            foundJobs.push_back(storage.getJobArray()[i]);
+        }
+    }
+    
+    if (foundJobs.getSize() > 0) {
+        cout << "\n[SUCCESS] Found " << foundJobs.getSize() << " job(s) matching \"" << title << "\":" << endl;
         cout << "=========================================" << endl;
-        found->display();
+        for (int i = 0; i < foundJobs.getSize(); i++) {
+            foundJobs[i].display();
+            if (i < foundJobs.getSize() - 1) {
+                cout << "---" << endl;
+            }
+        }
     } else {
         cout << "[NOT FOUND] No job with the title \"" << title << "\" was found." << endl;
     }
